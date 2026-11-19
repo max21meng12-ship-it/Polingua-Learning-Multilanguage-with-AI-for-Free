@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Polingual IELTS Studio — AI-Powered Band 8.5+ Preparation</title>
+  <meta name="description" content="Zero-cost AI IELTS & English Preparation Web App powered by Gemini API and Web Speech API." />
+  <meta name="theme-color" content="#4f46e5" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom scrollbar and subtle glassmorphism utilities */
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .glass-header {
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+    }
+
+    /* Custom Range Slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: #4f46e5;
+      border: 3px solid #ffffff;
+      box-shadow: 0 2px 6px rgba(79, 70, 229, 0.4);
+      margin-top: -6px;
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+    }
+
+    /* Smooth tab fade animation */
+    .tab-panel {
+      animation: fadeSlideIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Microphone recording pulse */
+    @keyframes micPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45); }
+      50% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+    }
+    .mic-active {
+      animation: micPulse 1.5s infinite;
+    }
+
+    /* Audio wave bars */
+    .wave-bar {
+      animation: waveBounce 0.9s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+    @keyframes waveBounce {
+      0%, 100% { height: 6px; }
+      50% { height: 22px; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col lg:flex-row bg-slate-50 text-slate-900 pb-20 lg:pb-0">
+
+  <!-- ===================================================================== -->
+  <!-- DESKTOP SIDEBAR NAVIGATION                                            -->
+  <!-- ===================================================================== -->
+  <aside class="hidden lg:flex lg:flex-col lg:w-72 lg:fixed lg:inset-y-0 bg-white border-r border-slate-200/90 z-30">
+    <!-- Brand Logo -->
+    <div class="flex items-center gap-3 px-6 h-18 py-5 border-b border-slate-100">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
+        <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-extrabold text-lg tracking-tight text-slate-900">Polingual</span>
+          <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-100">IELTS</span>
+        </div>
+        <p class="text-xs text-slate-500 font-medium">AI Band 8.5+ Studio</p>
+      </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 px-4 py-5 space-y-1.5 overflow-y-auto" aria-label="Main Navigation">
+      <button onclick="switchTab('dashboard')" data-nav="dashboard" class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition-all bg-indigo-50 text-indigo-700">
+        <i data-lucide="layout-dashboard" class="w-4 h-4 shrink-0"></i>
+        <span>Dashboard & Band Calc</span>
+      </button>
+
+      <button onclick="switchTab('writing')" data-nav="writing" class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-all">
+        <i data-lucide="pen-tool" class="w-4 h-4 shrink-0"></i>
+        <span>AI Writing Examiner</span>
+        <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">T1 & T2</span>
+      </button>
+
+      <button onclick="switchTab('speaking')" data-nav="speaking" class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-all">
+        <i data-lucide="mic" class="w-4 h-4 shrink-0"></i>
+        <span>AI Speaking Examiner</span>
+        <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">Voice</span>
+      </button>
+
+      <button onclick="switchTab('lab')" data-nav="lab" class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-all">
+        <i data-lucide="headphones" class="w-4 h-4 shrink-0"></i>
+        <span>Listening & Reading Lab</span>
+      </button>
+
+      <button onclick="switchTab('vocab')" data-nav="vocab" class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-all">
+        <i data-lucide="zap" class="w-4 h-4 shrink-0"></i>
+        <span>Vocab Upgrade Sprint</span>
+        <span class="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">Game</span>
+      </button>
+    </nav>
+
+    <!-- Sidebar Footer: Target Progress & API Status -->
+    <div class="p-4 border-t border-slate-100 space-y-3">
+      <div class="p-3.5 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+        <div class="flex items-center justify-between text-xs text-slate-300 mb-1">
+          <span>Target Overall Band</span>
+          <span class="font-mono font-bold text-emerald-400">8.0+</span>
+        </div>
+        <div class="flex items-baseline justify-between">
+          <span class="text-2xl font-extrabold" id="sidebar-avg-band">—</span>
+          <span class="text-xs text-slate-400" id="sidebar-xp-badge">0 Vocab XP</span>
+        </div>
+      </div>
+
+      <button onclick="openSettingsModal()" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/40 transition-all text-left">
+        <div class="flex items-center gap-2.5">
+          <span id="sidebar-api-dot" class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+          <div>
+            <p class="text-xs font-bold text-slate-800" id="sidebar-api-label">Gemini API Setup</p>
+            <p class="text-[11px] text-slate-500 font-mono" id="sidebar-model-label">gemini-2.5-flash</p>
+          </div>
+        </div>
+        <i data-lucide="settings" class="w-4 h-4 text-slate-400"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN CONTENT SHELL                                                    -->
+  <!-- ===================================================================== -->
+  <div class="flex-1 lg:pl-72 flex flex-col min-w-0">
+
+    <!-- Top Sticky Header -->
+    <header class="sticky top-0 z-20 glass-header border-b border-slate-200/80 px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <!-- Mobile Logo -->
+        <div class="lg:hidden w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-sm">
+          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 id="header-page-title" class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">Dashboard & Official Band Calculator</h1>
+          <p id="header-page-subtitle" class="hidden sm:block text-xs text-slate-500">Track your mock performance and compute official IELTS rounded scores</p>
+        </div>
+      </div>
+
+      <!-- Right Controls: Voice Toggle + BYOK Settings Modal Button -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button onclick="toggleVoiceMute()" id="header-voice-btn" title="Toggle Examiner Voice & Sound" class="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-all flex items-center gap-1.5 text-xs font-semibold">
+          <i data-lucide="volume-2" id="header-voice-icon" class="w-4 h-4 text-indigo-600"></i>
+          <span class="hidden md:inline" id="header-voice-text">Voice On</span>
+        </button>
+
+        <button onclick="openSettingsModal()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-2">
+          <span id="header-api-indicator" class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <i data-lucide="key-round" class="w-3.5 h-3.5 text-indigo-300"></i>
+          <span>API Key & Settings</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Workspace -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-6">
+
+      <!-- ================================================================= -->
+      <!-- TAB 1: DASHBOARD & OFFICIAL IELTS BAND CALCULATOR                 -->
+      <!-- ================================================================= -->
+      <section id="tab-dashboard" class="tab-panel space-y-6">
+
+        <!-- Progress KPI Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="glass-card rounded-2xl p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Average Band</span>
+              <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <i data-lucide="award" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-avg-band" class="text-2xl sm:text-3xl font-extrabold text-slate-900">—</span>
+              <span id="stat-cefr-badge" class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">No Mocks Yet</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1.5">Official IELTS rounding applied</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Writing Mocks</span>
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-writing-count" class="text-2xl sm:text-3xl font-extrabold text-slate-900">0</span>
+              <span class="text-xs font-semibold text-emerald-600" id="stat-writing-last">Latest: —</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1.5">Task 1 & Task 2 evaluated</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Speaking Mocks</span>
+              <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
+                <i data-lucide="mic" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-speaking-count" class="text-2xl sm:text-3xl font-extrabold text-slate-900">0</span>
+              <span class="text-xs font-semibold text-violet-600" id="stat-speaking-last">Latest: —</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1.5">Parts 1, 2 & 3 sessions</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 sm:p-5">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Vocab XP</span>
+              <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <i data-lucide="flame" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+              <span id="stat-vocab-xp" class="text-2xl sm:text-3xl font-extrabold text-slate-900">0</span>
+              <span class="text-xs font-bold text-amber-600" id="stat-vocab-best">Best: 0</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1.5">Band 8+ lexical mastery</p>
+          </div>
+        </div>
+
+        <!-- Calculator Grid: Official 4-Skill Calculator + Raw 40 Converter -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- Official IELTS Overall Band Score Calculator (7 cols) -->
+          <div class="lg:col-span-7 glass-card rounded-2xl p-5 sm:p-6 space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
+              <div>
+                <h2 class="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                  <i data-lucide="calculator" class="w-5 h-5 text-indigo-600"></i>
+                  Official IELTS Band Score Calculator
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Uses official IDP / British Council rounding (.25 → .5, .75 → next whole band)</p>
+              </div>
+              <button onclick="syncCalculatorFromMocks()" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">
+                Load My Mock Scores
+              </button>
+            </div>
+
+            <!-- 4 Skill Sliders -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Listening -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <label for="calc-listening" class="text-xs font-bold uppercase tracking-wider text-slate-600">Listening</label>
+                  <span id="calc-listening-val" class="font-mono text-base font-extrabold text-indigo-600 bg-white px-2.5 py-0.5 rounded-lg border border-slate-200">7.5</span>
+                </div>
+                <input id="calc-listening" type="range" min="0" max="9" step="0.5" value="7.5" oninput="updateBandCalculator()" class="w-full" />
+                <div class="flex justify-between text-[10px] font-mono text-slate-400">
+                  <span>0.0</span><span>4.5</span><span>7.0</span><span>9.0</span>
+                </div>
+              </div>
+
+              <!-- Reading -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <label for="calc-reading" class="text-xs font-bold uppercase tracking-wider text-slate-600">Reading</label>
+                  <span id="calc-reading-val" class="font-mono text-base font-extrabold text-indigo-600 bg-white px-2.5 py-0.5 rounded-lg border border-slate-200">7.0</span>
+                </div>
+                <input id="calc-reading" type="range" min="0" max="9" step="0.5" value="7.0" oninput="updateBandCalculator()" class="w-full" />
+                <div class="flex justify-between text-[10px] font-mono text-slate-400">
+                  <span>0.0</span><span>4.5</span><span>7.0</span><span>9.0</span>
+                </div>
+              </div>
+
+              <!-- Writing -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <label for="calc-writing" class="text-xs font-bold uppercase tracking-wider text-slate-600">Writing</label>
+                  <span id="calc-writing-val" class="font-mono text-base font-extrabold text-indigo-600 bg-white px-2.5 py-0.5 rounded-lg border border-slate-200">6.5</span>
+                </div>
+                <input id="calc-writing" type="range" min="0" max="9" step="0.5" value="6.5" oninput="updateBandCalculator()" class="w-full" />
+                <div class="flex justify-between text-[10px] font-mono text-slate-400">
+                  <span>0.0</span><span>4.5</span><span>7.0</span><span>9.0</span>
+                </div>
+              </div>
+
+              <!-- Speaking -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <label for="calc-speaking" class="text-xs font-bold uppercase tracking-wider text-slate-600">Speaking</label>
+                  <span id="calc-speaking-val" class="font-mono text-base font-extrabold text-indigo-600 bg-white px-2.5 py-0.5 rounded-lg border border-slate-200">7.0</span>
+                </div>
+                <input id="calc-speaking" type="range" min="0" max="9" step="0.5" value="7.0" oninput="updateBandCalculator()" class="w-full" />
+                <div class="flex justify-between text-[10px] font-mono text-slate-400">
+                  <span>0.0</span><span>4.5</span><span>7.0</span><span>9.0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Result Banner -->
+            <div class="p-5 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg shadow-indigo-500/20">
+              <div class="space-y-1 text-center sm:text-left">
+                <div class="flex items-center justify-center sm:justify-start gap-2">
+                  <span class="text-xs font-bold uppercase tracking-widest text-indigo-200">Overall IELTS Band</span>
+                  <span id="calc-cefr-pill" class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-white/15 text-white">CEFR C1</span>
+                </div>
+                <h3 id="calc-descriptor" class="text-lg font-bold">Good User</h3>
+                <p id="calc-formula-text" class="text-xs text-indigo-200 font-mono">Mean: (7.5 + 7.0 + 6.5 + 7.0) / 4 = 7.00 → Band 7.0</p>
+              </div>
+              <div class="w-20 h-20 rounded-2xl bg-white text-indigo-700 flex flex-col items-center justify-center shrink-0 shadow-md">
+                <span id="calc-overall-result" class="text-3xl font-black leading-none">7.0</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">BAND</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Raw Score (Out of 40) to Band Converter (5 cols) -->
+          <div class="lg:col-span-5 glass-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
+            <div class="space-y-4">
+              <div class="border-b border-slate-100 pb-4">
+                <h2 class="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                  <i data-lucide="sliders" class="w-5 h-5 text-emerald-600"></i>
+                  Raw Score (/40) Converter
+                </h2>
+                <p class="text-xs text-slate-500 mt-0.5">Convert correct answers (0–40) to official Band scores</p>
+              </div>
+
+              <!-- Module Type Tabs -->
+              <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl">
+                <button onclick="setRawConverterType('listening')" id="raw-type-listening" class="raw-type-btn py-2 px-2 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-sm transition-all">Listening</button>
+                <button onclick="setRawConverterType('academic')" id="raw-type-academic" class="raw-type-btn py-2 px-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all">Acad. Reading</button>
+                <button onclick="setRawConverterType('general')" id="raw-type-general" class="raw-type-btn py-2 px-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all">Gen. Reading</button>
+              </div>
+
+              <!-- Raw Score Input -->
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-600">Correct Answers (out of 40)</span>
+                  <div class="flex items-center gap-1.5">
+                    <input id="raw-score-input" type="number" min="0" max="40" value="30" oninput="updateRawConverter(this.value)" class="w-16 text-center font-mono font-extrabold text-sm py-1 px-2 rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <span class="text-xs font-bold text-slate-400">/ 40</span>
+                  </div>
+                </div>
+                <input id="raw-score-slider" type="range" min="0" max="40" step="1" value="30" oninput="updateRawConverter(this.value)" class="w-full" />
+              </div>
+
+              <!-- Converted Result Card -->
+              <div class="p-4 rounded-xl bg-emerald-50/80 border border-emerald-200 flex items-center justify-between">
+                <div>
+                  <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700" id="raw-module-label">IELTS Listening Band</span>
+                  <p class="text-xs text-emerald-800/80 mt-0.5" id="raw-next-threshold">32/40 needed for Band 7.5</p>
+                </div>
+                <div class="text-right">
+                  <span id="raw-converted-band" class="text-3xl font-black text-emerald-700">7.0</span>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="applyRawToCalculator()" class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all flex items-center justify-center gap-2">
+              <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+              <span>Apply to Overall Calculator</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent AI Evaluations History -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-base font-extrabold text-slate-900">Recent AI Practice History</h3>
+              <p class="text-xs text-slate-500">Stored locally in your browser (100% private, zero cloud cost)</p>
+            </div>
+            <button onclick="confirmClearStats()" class="text-xs font-semibold text-rose-600 hover:text-rose-700 px-3 py-1.5 rounded-lg hover:bg-rose-50 transition-colors">
+              Reset History
+            </button>
+          </div>
+          <div id="history-list" class="space-y-2.5">
+            <div class="text-center py-8 text-xs text-slate-400 bg-slate-50/70 rounded-xl border border-dashed border-slate-200">
+              No evaluated sessions yet. Try grading a Writing essay or Speaking session!
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 2: AI WRITING EXAMINER (TASK 1 & TASK 2)                      -->
+      <!-- ================================================================= -->
+      <section id="tab-writing" class="tab-panel hidden space-y-6">
+
+        <!-- Control Bar -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+            <button onclick="setWritingTask('task2')" id="btn-writing-task2" class="px-4 py-2 rounded-lg text-xs font-extrabold bg-white text-indigo-700 shadow-sm transition-all">
+              Task 2: Essay (250w)
+            </button>
+            <button onclick="setWritingTask('task1')" id="btn-writing-task1" class="px-4 py-2 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition-all">
+              Task 1: Report / Letter (150w)
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="loadCuratedWritingPrompt()" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center gap-1.5 transition-all">
+              <i data-lucide="shuffle" class="w-3.5 h-3.5 text-indigo-600"></i>
+              <span>Next Curated Topic</span>
+            </button>
+            <button onclick="generateAIWritingPrompt()" id="btn-ai-topic" class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center gap-1.5 transition-all">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span>AI Fresh Prompt</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Prompt Display Card -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 border-l-4 border-l-indigo-600 space-y-2">
+          <div class="flex items-center justify-between">
+            <span id="writing-prompt-badge" class="text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700">IELTS Academic Writing Task 2</span>
+            <span id="writing-prompt-theme" class="text-xs font-semibold text-slate-400">Theme: Technology & Society</span>
+          </div>
+          <p id="writing-prompt-text" class="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed">
+            Some people believe that artificial intelligence will replace most human jobs in the near future, leading to widespread unemployment. Others argue that it will create new opportunities and improve overall living standards. Discuss both these views and give your own opinion.
+          </p>
+        </div>
+
+        <!-- Editor & Timer Card -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+          <!-- Editor Toolbar -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+            <!-- Exam Timer -->
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 text-white font-mono text-xs font-bold">
+                <i data-lucide="timer" class="w-3.5 h-3.5 text-amber-400"></i>
+                <span id="writing-timer-display">40:00</span>
+              </div>
+              <button onclick="toggleWritingTimer()" id="writing-timer-btn" class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700">
+                Start Timer
+              </button>
+              <button onclick="resetWritingTimer()" class="p-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-500" title="Reset Timer">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+
+            <!-- Live Word Count -->
+            <div class="flex items-center gap-3">
+              <div class="text-right">
+                <span id="writing-word-count" class="font-mono text-sm font-extrabold text-slate-900">0</span>
+                <span id="writing-word-target" class="text-xs text-slate-500 font-medium"> / 250 min words</span>
+              </div>
+              <div class="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div id="writing-word-bar" class="h-full bg-amber-500 transition-all duration-200" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Textarea -->
+          <textarea id="writing-essay-input" oninput="updateWritingWordCount()" rows="11" placeholder="Write your IELTS response here. Aim for clear paragraphing (Introduction, Body Paragraph 1, Body Paragraph 2, Conclusion), formal academic tone, and cohesive linking devices..." class="w-full p-4 rounded-xl bg-slate-50/70 border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base leading-relaxed text-slate-800 resize-y"></textarea>
+
+          <!-- Action Footer -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <div class="flex items-center gap-2">
+              <button onclick="insertSampleEssay()" class="text-xs font-semibold text-slate-500 hover:text-indigo-600 px-3 py-2 rounded-lg hover:bg-indigo-50/60 transition-colors">
+                Insert Sample Draft (Test AI)
+              </button>
+              <button onclick="copyWritingText()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors flex items-center gap-1">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                <span>Copy</span>
+              </button>
+            </div>
+
+            <button onclick="evaluateWritingWithAI()" id="btn-evaluate-writing" class="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-sm font-extrabold shadow-md shadow-indigo-500/25 transition-all flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>Evaluate Essay with AI</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Writing AI Feedback Report Container -->
+        <div id="writing-result-container" class="hidden space-y-6">
+          <!-- Score Overview & 4 Criteria -->
+          <div class="glass-card rounded-2xl p-6 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Official Criterion-Based Assessment</span>
+                <h3 class="text-xl font-extrabold text-slate-900 mt-0.5">Examiner Diagnostic Report</h3>
+                <p id="writing-examiner-summary" class="text-xs sm:text-sm text-slate-600 mt-1"></p>
+              </div>
+              <div class="flex items-center gap-3 bg-indigo-50 border border-indigo-100 px-5 py-3 rounded-2xl shrink-0">
+                <div>
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-indigo-500 block">Estimated Band</span>
+                  <span class="text-xs font-semibold text-indigo-800">All 4 Criteria</span>
+                </div>
+                <span id="writing-res-overall" class="text-4xl font-black text-indigo-700">7.0</span>
+              </div>
+            </div>
+
+            <!-- 4 Criteria Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="writing-criteria-grid"></div>
+          </div>
+
+          <!-- Line-by-Line Error Corrections -->
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <h4 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600"></i>
+              Targeted Grammar & Lexical Upgrades
+            </h4>
+            <div id="writing-corrections-list" class="space-y-3"></div>
+          </div>
+
+          <!-- Band 8.5+ Model Rewrite -->
+          <div class="glass-card rounded-2xl p-6 bg-gradient-to-br from-emerald-50/60 to-white border-emerald-200/80 space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-base font-extrabold text-emerald-900 flex items-center gap-2">
+                <i data-lucide="trophy" class="w-5 h-5 text-emerald-600"></i>
+                Band 8.5+ Upgraded Sample Rewrite
+              </h4>
+              <button onclick="copyBand85Rewrite()" class="text-xs font-bold text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg transition-colors">
+                Copy Rewrite
+              </button>
+            </div>
+            <div id="writing-band85-text" class="text-sm text-slate-800 leading-relaxed whitespace-pre-line bg-white/80 p-4 rounded-xl border border-emerald-100"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 3: AI SPEAKING EXAMINER (VOICE + TEXT)                        -->
+      <!-- ================================================================= -->
+      <section id="tab-speaking" class="tab-panel hidden space-y-6">
+
+        <!-- Part Selector -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+            <button onclick="setSpeakingPart('part1')" id="sp-btn-part1" class="px-3.5 py-2 rounded-lg text-xs font-extrabold bg-white text-indigo-700 shadow-sm transition-all">
+              Part 1: Interview
+            </button>
+            <button onclick="setSpeakingPart('part2')" id="sp-btn-part2" class="px-3.5 py-2 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition-all">
+              Part 2: Cue Card (2m)
+            </button>
+            <button onclick="setSpeakingPart('part3')" id="sp-btn-part3" class="px-3.5 py-2 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition-all">
+              Part 3: Discussion
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="nextSpeakingPrompt()" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <i data-lucide="skip-forward" class="w-3.5 h-3.5 text-indigo-600"></i>
+              <span>New Question</span>
+            </button>
+            <button onclick="resetSpeakingSession()" class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors">
+              Clear Session
+            </button>
+          </div>
+        </div>
+
+        <!-- Examiner Booth Card -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 space-y-5">
+          <!-- Examiner Header & Question -->
+          <div class="flex flex-col sm:flex-row sm:items-start gap-4 p-4 rounded-2xl bg-slate-900 text-white">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shrink-0 relative">
+              <i data-lucide="user-check" class="w-6 h-6 text-white"></i>
+              <div id="examiner-wave" class="hidden absolute -bottom-1.5 flex items-end gap-0.5 h-4 bg-emerald-500 px-1.5 py-0.5 rounded-full">
+                <span class="wave-bar w-0.5 bg-white rounded-full"></span>
+                <span class="wave-bar w-0.5 bg-white rounded-full"></span>
+                <span class="wave-bar w-0.5 bg-white rounded-full"></span>
+                <span class="wave-bar w-0.5 bg-white rounded-full"></span>
+              </div>
+            </div>
+            <div class="flex-1 space-y-2">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span id="speaking-part-label" class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">IELTS Speaking Part 1 • Examiner</span>
+                <button onclick="speakCurrentQuestion()" class="text-xs font-bold px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center gap-1.5 transition-colors">
+                  <i data-lucide="volume-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+                  <span>Read Aloud</span>
+                </button>
+              </div>
+              <p id="speaking-question-text" class="text-sm sm:text-base font-semibold leading-relaxed text-slate-100">
+                Let's talk about your hometown or where you currently live. What do you find most interesting about the area you live in?
+              </p>
+
+              <!-- Part 2 Cue Card Box (Hidden in Part 1 & 3) -->
+              <div id="speaking-cue-card" class="hidden mt-3 p-4 rounded-xl bg-slate-800/90 border border-slate-700 space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400">Cue Card — 1 Min Prep / 2 Min Talk</span>
+                  <div class="flex items-center gap-2">
+                    <button onclick="startCueCardTimer('prep')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30">
+                      60s Prep Timer
+                    </button>
+                    <button onclick="startCueCardTimer('talk')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30">
+                      2m Speak Timer
+                    </button>
+                    <span id="cue-card-timer" class="font-mono text-xs font-bold px-2 py-1 rounded bg-slate-950 text-white">01:00</span>
+                  </div>
+                </div>
+                <ul id="speaking-cue-bullets" class="list-disc list-inside text-xs sm:text-sm text-slate-300 space-y-1"></ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Microphone + Editable Transcript Box -->
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Your Spoken / Typed Answer</label>
+              <span id="speech-status-badge" class="text-xs font-semibold text-slate-400">Click microphone to speak or type directly</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button onclick="toggleSpeechRecognition()" id="btn-mic-record" class="sm:w-44 py-4 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex flex-col items-center justify-center gap-2 shadow-md shadow-indigo-500/20 transition-all shrink-0">
+                <i data-lucide="mic" id="mic-btn-icon" class="w-6 h-6"></i>
+                <span id="mic-btn-label">Start Speaking</span>
+              </button>
+
+              <textarea id="speaking-answer-input" rows="4" placeholder="Your live voice transcription will appear here automatically as you speak... (You can also edit or type your response manually)." class="flex-1 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-800 leading-relaxed"></textarea>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <button onclick="submitSpeakingTurn(true)" id="btn-speaking-followup" class="px-4 py-2.5 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center gap-1.5 transition-all">
+                <i data-lucide="message-square-plus" class="w-4 h-4"></i>
+                <span>Submit Answer & Ask AI Follow-Up</span>
+              </button>
+
+              <button onclick="evaluateSpeakingSession()" id="btn-evaluate-speaking" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm transition-all flex items-center gap-2">
+                <i data-lucide="award" class="w-4 h-4"></i>
+                <span>Grade Speaking Session</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Conversation Transcript Log -->
+          <div id="speaking-transcript-box" class="hidden space-y-2.5 pt-4 border-t border-slate-100">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Recorded Session Turns</h4>
+            <div id="speaking-turns-list" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+
+        <!-- Speaking AI Evaluation Result -->
+        <div id="speaking-result-container" class="hidden glass-card rounded-2xl p-6 space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-violet-600">IELTS Speaking Assessment</span>
+              <h3 class="text-lg font-extrabold text-slate-900">Fluency, Lexical & Band 8+ Upgrade Report</h3>
+              <p id="speaking-res-summary" class="text-xs sm:text-sm text-slate-600 mt-1"></p>
+            </div>
+            <div class="flex items-center gap-3 bg-violet-50 border border-violet-100 px-5 py-3 rounded-2xl shrink-0">
+              <span class="text-xs font-bold text-violet-700">Speaking Band</span>
+              <span id="speaking-res-overall" class="text-3xl font-black text-violet-700">7.0</span>
+            </div>
+          </div>
+
+          <div id="speaking-criteria-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></div>
+
+          <div class="space-y-2.5">
+            <h4 class="text-sm font-extrabold text-slate-900">Natural Band 8+ Phrasing Upgrades</h4>
+            <div id="speaking-upgrades-list" class="space-y-2.5"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 4: AI LISTENING & READING LAB                                 -->
+      <!-- ================================================================= -->
+      <section id="tab-lab" class="tab-panel hidden space-y-6">
+
+        <!-- Lab Mode Switcher -->
+        <div class="glass-card rounded-2xl p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+            <button onclick="setLabMode('reading')" id="lab-btn-reading" class="px-4 py-2 rounded-lg text-xs font-extrabold bg-white text-indigo-700 shadow-sm transition-all flex items-center gap-1.5">
+              <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+              <span>Academic Reading</span>
+            </button>
+            <button onclick="setLabMode('listening')" id="lab-btn-listening" class="px-4 py-2 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
+              <i data-lucide="headphones" class="w-3.5 h-3.5"></i>
+              <span>AI Listening Simulator</span>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="cycleLabPreset()" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700">
+              Switch Built-in Test
+            </button>
+            <button onclick="generateAILabTest()" id="btn-generate-lab" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span>AI Generate New Test</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lab Workspace -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Left Pane: Reading Passage OR Listening Audio Player (7 cols) -->
+          <div class="lg:col-span-7 glass-card rounded-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span id="lab-badge" class="text-[11px] font-bold uppercase tracking-wider text-indigo-600">IELTS Academic Reading Passage</span>
+                <h3 id="lab-title" class="text-base sm:text-lg font-extrabold text-slate-900 mt-0.5">The Evolution of Bioluminescence in Deep-Sea Ecosystems</h3>
+              </div>
+            </div>
+
+            <!-- Listening Audio Controller (Visible only in Listening Mode) -->
+            <div id="listening-player-box" class="hidden p-5 rounded-2xl bg-slate-900 text-white space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center">
+                    <i data-lucide="radio" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs font-bold text-indigo-300">Web Speech Audio Stream</p>
+                    <p id="listening-status-text" class="text-xs text-slate-300">Ready to play audio recording</p>
+                  </div>
+                </div>
+                <select id="listening-speed-select" class="bg-slate-800 border border-slate-700 text-xs font-bold rounded-lg px-2.5 py-1.5 text-white">
+                  <option value="0.85">0.85x Slow</option>
+                  <option value="1.0" selected>1.0x Normal</option>
+                  <option value="1.15">1.15x Fast</option>
+                </select>
+              </div>
+
+              <div class="flex items-center gap-2.5">
+                <button onclick="playListeningAudio()" class="flex-1 py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-all">
+                  <i data-lucide="play" class="w-4 h-4"></i>
+                  <span>Play Audio</span>
+                </button>
+                <button onclick="stopListeningAudio()" class="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center justify-center gap-1.5">
+                  <i data-lucide="square" class="w-4 h-4"></i>
+                  <span>Stop</span>
+                </button>
+                <button onclick="toggleListeningTranscript()" id="btn-toggle-transcript" class="py-2.5 px-3.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-xs font-bold text-slate-300">
+                  Show Script
+                </button>
+              </div>
+            </div>
+
+            <!-- Passage / Transcript Text -->
+            <div id="lab-passage-container" class="text-sm text-slate-700 leading-relaxed space-y-3 max-h-[460px] overflow-y-auto pr-2"></div>
+          </div>
+
+          <!-- Right Pane: Comprehension Questions (5 cols) -->
+          <div class="lg:col-span-5 glass-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
+            <div class="space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h4 class="text-sm font-extrabold text-slate-900">Questions 1–4</h4>
+                <span id="lab-score-pill" class="hidden text-xs font-extrabold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700">Score: 4/4</span>
+              </div>
+              <div id="lab-questions-list" class="space-y-4 max-h-[460px] overflow-y-auto pr-1"></div>
+            </div>
+
+            <button onclick="gradeLabAnswers()" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-sm transition-all">
+              Submit & Check Answers
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- TAB 5: VOCABULARY BOOSTER GAME (BAND 6 -> BAND 8+ SPRINT)         -->
+      <!-- ================================================================= -->
+      <section id="tab-vocab" class="tab-panel hidden space-y-6">
+
+        <!-- Game Header Bar -->
+        <div class="glass-card rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-600">60-Second Lexical Resource Challenge</span>
+            <h2 class="text-lg font-extrabold text-slate-900">Band 6 → Band 8+ Upgrade Sprint</h2>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="vocab-topic-select" class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700">
+              <option value="General Academic">General Academic Deck</option>
+              <option value="Environment & Climate">Environment & Climate</option>
+              <option value="Technology & AI">Technology & Innovation</option>
+              <option value="Healthcare & Society">Healthcare & Society</option>
+            </select>
+            <button onclick="generateAIVocabDeck()" id="btn-ai-vocab" class="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span>AI Custom Deck</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Game Arena -->
+        <div class="glass-card rounded-2xl p-6 sm:p-8 max-w-3xl mx-auto space-y-6">
+          <!-- HUD -->
+          <div class="grid grid-cols-3 gap-3">
+            <div class="p-3 rounded-xl bg-slate-900 text-white text-center">
+              <span class="text-[10px] uppercase tracking-wider text-slate-400 block">Time Left</span>
+              <span id="vocab-timer" class="font-mono text-2xl font-black text-amber-400">60s</span>
+            </div>
+            <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-center">
+              <span class="text-[10px] uppercase tracking-wider text-indigo-500 block">Sprint Score</span>
+              <span id="vocab-score" class="font-mono text-2xl font-black text-indigo-700">0</span>
+            </div>
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-center">
+              <span class="text-[10px] uppercase tracking-wider text-emerald-600 block">Streak Multiplier</span>
+              <span id="vocab-streak" class="font-mono text-2xl font-black text-emerald-700">1x</span>
+            </div>
+          </div>
+
+          <!-- Start Overlay / Active Question -->
+          <div id="vocab-start-screen" class="text-center py-8 space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+              <i data-lucide="zap" class="w-8 h-8"></i>
+            </div>
+            <div class="max-w-md mx-auto space-y-1.5">
+              <h3 class="text-xl font-extrabold text-slate-900">Upgrade Band 6 Phrases Under Pressure</h3>
+              <p class="text-xs sm:text-sm text-slate-500">Replace the highlighted everyday phrase with its precise Band 8.5+ academic collocation before the 60-second clock runs out.</p>
+            </div>
+            <button onclick="startVocabSprint()" class="px-8 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-lg shadow-indigo-500/25 transition-all">
+              Start 60-Second Sprint
+            </button>
+          </div>
+
+          <div id="vocab-play-screen" class="hidden space-y-5">
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Upgrade the highlighted Band 6 expression:</span>
+              <p id="vocab-sentence" class="text-base sm:text-lg font-semibold text-slate-800 leading-relaxed"></p>
+            </div>
+
+            <div id="vocab-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+
+            <div id="vocab-feedback-banner" class="hidden p-3.5 rounded-xl text-xs font-semibold"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION BAR                                          -->
+  <!-- ===================================================================== -->
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 z-30 glass-header border-t border-slate-200 grid grid-cols-5 h-16 px-1" aria-label="Mobile Navigation">
+    <button onclick="switchTab('dashboard')" data-nav="dashboard" class="mob-nav-btn flex flex-col items-center justify-center gap-1 text-indigo-600">
+      <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Calc</span>
+    </button>
+    <button onclick="switchTab('writing')" data-nav="writing" class="mob-nav-btn flex flex-col items-center justify-center gap-1 text-slate-500">
+      <i data-lucide="pen-tool" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Writing</span>
+    </button>
+    <button onclick="switchTab('speaking')" data-nav="speaking" class="mob-nav-btn flex flex-col items-center justify-center gap-1 text-slate-500">
+      <i data-lucide="mic" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Speaking</span>
+    </button>
+    <button onclick="switchTab('lab')" data-nav="lab" class="mob-nav-btn flex flex-col items-center justify-center gap-1 text-slate-500">
+      <i data-lucide="headphones" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">L & R Lab</span>
+    </button>
+    <button onclick="switchTab('vocab')" data-nav="vocab" class="mob-nav-btn flex flex-col items-center justify-center gap-1 text-slate-500">
+      <i data-lucide="zap" class="w-5 h-5"></i>
+      <span class="text-[10px] font-bold">Vocab</span>
+    </button>
+  </nav>
+
+  <!-- ===================================================================== -->
+  <!-- BYOK API KEY & VOICE SETTINGS MODAL                                   -->
+  <!-- ===================================================================== -->
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <i data-lucide="key-round" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900">Gemini API (BYOK) & Voice Settings</h3>
+            <p class="text-xs text-slate-500">100% Free-Tier architecture stored locally in your browser</p>
+          </div>
+        </div>
+        <button onclick="closeSettingsModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- API Key Input -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label for="modal-api-key" class="text-xs font-bold text-slate-700">Google AI Studio Gemini API Key</label>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1">
+            <span>Get Free Key</span>
+            <i data-lucide="external-link" class="w-3 h-3"></i>
+          </a>
+        </div>
+        <div class="relative">
+          <input id="modal-api-key" type="password" placeholder="AIzaSy..." class="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-300 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <button onclick="toggleApiKeyVisibility()" type="button" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-700">
+            <i data-lucide="eye" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-500">Saved strictly in <code class="font-mono bg-slate-100 px-1 rounded">localStorage.gemini_api_key</code>. Never sent to any third-party server.</p>
+      </div>
+
+      <!-- Model & Voice Accent -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div class="space-y-1.5">
+          <label for="modal-model-select" class="text-xs font-bold text-slate-700">Gemini Model</label>
+          <select id="modal-model-select" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="gemini-2.5-flash">gemini-2.5-flash (Recommended)</option>
+            <option value="gemini-3-flash-preview">gemini-3-flash-preview</option>
+          </select>
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="modal-accent-select" class="text-xs font-bold text-slate-700">Examiner Accent (TTS)</label>
+          <select id="modal-accent-select" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="en-GB">British English (en-GB)</option>
+            <option value="en-US">American English (en-US)</option>
+            <option value="en-AU">Australian English (en-AU)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Auto-speak toggle -->
+      <label class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 cursor-pointer">
+        <div>
+          <p class="text-xs font-bold text-slate-800">Examiner Auto-Voice Readout</p>
+          <p class="text-[11px] text-slate-500">Automatically read Speaking questions aloud via Web Speech API</p>
+        </div>
+        <input id="modal-voice-toggle" type="checkbox" checked class="w-4 h-4 accent-indigo-600 rounded" />
+      </label>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-between gap-3 pt-2">
+        <button onclick="clearSavedApiKey()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors">
+          Remove Key
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="closeSettingsModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50">
+            Cancel
+          </button>
+          <button onclick="saveSettingsModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold shadow-sm">
+            Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- CUSTOM CONFIRMATION MODAL (NO NATIVE CONFIRM/ALERT USED)              -->
+  <!-- ===================================================================== -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-200 space-y-4">
+      <h4 id="confirm-modal-title" class="text-base font-extrabold text-slate-900">Confirm Action</h4>
+      <p id="confirm-modal-msg" class="text-xs text-slate-600 leading-relaxed"></p>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+        <button id="confirm-modal-ok" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER                                          -->
+  <!-- ===================================================================== -->
+  <div id="toast-container" class="fixed bottom-20 lg:bottom-6 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- ===================================================================== -->
+  <!-- APPLICATION JAVASCRIPT LOGIC                                          -->
+  <!-- ===================================================================== -->
+  <script>
+    // Runtime API key placeholder (populated automatically in Canvas runtime if available,
+    // or overridden by user's BYOK key stored in localStorage.gemini_api_key)
+    const apiKey = "";
+
+    // =========================================================================
+    // 1. STATE MANAGEMENT & LOCALSTORAGE PERSISTENCE
+    // =========================================================================
+    const STORAGE_KEYS = {
+      API_KEY: 'gemini_api_key',
+      MODEL: 'polingual_gemini_model',
+      ACCENT: 'polingual_voice_accent',
+      VOICE_ENABLED: 'polingual_voice_enabled',
+      STATS: 'polingual_ielts_stats'
+    };
+
+    const defaultStats = {
+      writingScores: [],
+      speakingScores: [],
+      readingScores: [],
+      listeningScores: [],
+      vocabXP: 0,
+      vocabBest: 0,
+      history: [] // { type, title, band, date }
+    };
+
+    let appState = {
+      activeTab: 'dashboard',
+      model: localStorage.getItem(STORAGE_KEYS.MODEL) || 'gemini-2.5-flash',
+      accent: localStorage.getItem(STORAGE_KEYS.ACCENT) || 'en-GB',
+      voiceEnabled: localStorage.getItem(STORAGE_KEYS.VOICE_ENABLED) !== 'false',
+      stats: loadStats(),
+      // Writing state
+      writingTask: 'task2',
+      writingPromptIdx: 0,
+      writingTimerSeconds: 40 * 60,
+      writingTimerInterval: null,
+      lastBand85Rewrite: '',
+      // Speaking state
+      speakingPart: 'part1',
+      speakingPromptIdx: 0,
+      speakingTurns: [],
+      isRecording: false,
+      recognition: null,
+      cueTimerInterval: null,
+      // Lab state
+      labMode: 'reading',
+      labPresetIdx: 0,
+      currentLabData: null,
+      transcriptVisible: false,
+      // Vocab game state
+      vocabActive: false,
+      vocabTimer: 60,
+      vocabScore: 0,
+      vocabStreak: 1,
+      vocabInterval: null,
+      vocabDeck: [],
+      vocabIndex: 0
+    };
+
+    function loadStats() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.STATS);
+        return raw ? { ...defaultStats, ...JSON.parse(raw) } : { ...defaultStats };
+      } catch {
+        return { ...defaultStats };
+      }
+    }
+
+    function saveStats() {
+      localStorage.setItem(STORAGE_KEYS.STATS, JSON.stringify(appState.stats));
+      renderDashboardStats();
+    }
+
+    function getEffectiveApiKey() {
+      const userKey = (localStorage.getItem(STORAGE_KEYS.API_KEY) || '').trim();
+      return userKey || apiKey;
+    }
+
+    // =========================================================================
+    // 2. UI UTILITIES: TOASTS, MODALS, NAVIGATION & PWA MANIFEST
+    // =========================================================================
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colors = {
+        info: 'bg-slate-900 text-white border-slate-700',
+        success: 'bg-emerald-600 text-white border-emerald-500',
+        warning: 'bg-amber-500 text-slate-950 border-amber-400',
+        error: 'bg-rose-600 text-white border-rose-500'
+      };
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-lg text-xs font-bold flex items-center justify-between gap-3 transition-all transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+      toast.innerHTML = `<span>${escapeHTML(message)}</span>`;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 250);
+      }, 3600);
+    }
+
+    function escapeHTML(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    const TAB_META = {
+      dashboard: {
+        title: 'Dashboard & Official Band Calculator',
+        subtitle: 'Track your mock performance and compute official IELTS rounded scores'
+      },
+      writing: {
+        title: 'AI Writing Examiner (Task 1 & Task 2)',
+        subtitle: 'Strict 4-criterion grading, grammar corrections & Band 8.5+ rewrites'
+      },
+      speaking: {
+        title: 'AI Speaking Examiner (Voice + Text)',
+        subtitle: 'Simulate Parts 1, 2 & 3 with Web Speech recognition and instant Band feedback'
+      },
+      lab: {
+        title: 'AI Listening & Reading Lab',
+        subtitle: 'Academic reading passages & speech-synthesized IELTS listening tests'
+      },
+      vocab: {
+        title: 'Vocabulary Upgrade Sprint (Band 6 → 8+)',
+        subtitle: '60-second timed challenge to master high-scoring academic collocations'
+      }
+    };
+
+    function switchTab(tabId) {
+      appState.activeTab = tabId;
+      document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) target.classList.remove('hidden');
+
+      // Update Desktop Sidebar active styles
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const active = btn.dataset.nav === tabId;
+        btn.className = active
+          ? 'nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold transition-all bg-indigo-50 text-indigo-700'
+          : 'nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-all';
+      });
+
+      // Update Mobile Bottom Nav active styles
+      document.querySelectorAll('.mob-nav-btn').forEach(btn => {
+        const active = btn.dataset.nav === tabId;
+        btn.className = active
+          ? 'mob-nav-btn flex flex-col items-center justify-center gap-1 text-indigo-600'
+          : 'mob-nav-btn flex flex-col items-center justify-center gap-1 text-slate-500';
+      });
+
+      // Update Header Titles
+      const meta = TAB_META[tabId];
+      if (meta) {
+        document.getElementById('header-page-title').textContent = meta.title;
+        document.getElementById('header-page-subtitle').textContent = meta.subtitle;
+      }
+
+      if (tabId !== 'listening') stopListeningAudio();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Settings Modal Controls
+    function openSettingsModal() {
+      document.getElementById('modal-api-key').value = localStorage.getItem(STORAGE_KEYS.API_KEY) || '';
+      document.getElementById('modal-model-select').value = appState.model;
+      document.getElementById('modal-accent-select').value = appState.accent;
+      document.getElementById('modal-voice-toggle').checked = appState.voiceEnabled;
+      document.getElementById('settings-modal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.add('hidden');
+    }
+
+    function toggleApiKeyVisibility() {
+      const inp = document.getElementById('modal-api-key');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    function saveSettingsModal() {
+      const keyVal = document.getElementById('modal-api-key').value.trim();
+      const modelVal = document.getElementById('modal-model-select').value;
+      const accentVal = document.getElementById('modal-accent-select').value;
+      const voiceVal = document.getElementById('modal-voice-toggle').checked;
+
+      if (keyVal) {
+        localStorage.setItem(STORAGE_KEYS.API_KEY, keyVal);
+      } else {
+        localStorage.removeItem(STORAGE_KEYS.API_KEY);
+      }
+
+      appState.model = modelVal;
+      appState.accent = accentVal;
+      appState.voiceEnabled = voiceVal;
+
+      localStorage.setItem(STORAGE_KEYS.MODEL, modelVal);
+      localStorage.setItem(STORAGE_KEYS.ACCENT, accentVal);
+      localStorage.setItem(STORAGE_KEYS.VOICE_ENABLED, String(voiceVal));
+
+      updateApiStatusIndicators();
+      closeSettingsModal();
+      showToast('Settings saved locally in browser!', 'success');
+    }
+
+    function clearSavedApiKey() {
+      localStorage.removeItem(STORAGE_KEYS.API_KEY);
+      document.getElementById('modal-api-key').value = '';
+      updateApiStatusIndicators();
+      showToast('Custom API key removed.', 'info');
+    }
+
+    function updateApiStatusIndicators() {
+      const hasUserKey = Boolean((localStorage.getItem(STORAGE_KEYS.API_KEY) || '').trim());
+      const headerDot = document.getElementById('header-api-indicator');
+      const sidebarDot = document.getElementById('sidebar-api-dot');
+      const sidebarLabel = document.getElementById('sidebar-api-label');
+      const sidebarModel = document.getElementById('sidebar-model-label');
+
+      sidebarModel.textContent = appState.model;
+
+      if (hasUserKey) {
+        headerDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        sidebarDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+        sidebarLabel.textContent = 'BYOK Key Active';
+      } else {
+        headerDot.className = 'w-2 h-2 rounded-full bg-amber-400';
+        sidebarDot.className = 'w-2.5 h-2.5 rounded-full bg-amber-500';
+        sidebarLabel.textContent = 'Add Free API Key';
+      }
+
+      const voiceText = document.getElementById('header-voice-text');
+      const voiceIcon = document.getElementById('header-voice-icon');
+      voiceText.textContent = appState.voiceEnabled ? 'Voice On' : 'Voice Muted';
+      voiceIcon.setAttribute('data-lucide', appState.voiceEnabled ? 'volume-2' : 'volume-x');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function toggleVoiceMute() {
+      appState.voiceEnabled = !appState.voiceEnabled;
+      localStorage.setItem(STORAGE_KEYS.VOICE_ENABLED, String(appState.voiceEnabled));
+      if (!appState.voiceEnabled && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      updateApiStatusIndicators();
+      showToast(appState.voiceEnabled ? 'Examiner voice enabled' : 'Examiner voice muted', 'info');
+    }
+
+    // Custom Confirm Modal
+    function showConfirmModal(title, message, onConfirm) {
+      document.getElementById('confirm-modal-title').textContent = title;
+      document.getElementById('confirm-modal-msg').textContent = message;
+      const okBtn = document.getElementById('confirm-modal-ok');
+      okBtn.onclick = () => {
+        closeConfirmModal();
+        onConfirm();
+      };
+      document.getElementById('confirm-modal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirm-modal').classList.add('hidden');
+    }
+
+    // =========================================================================
+    // 3. GEMINI API CLIENT (WITH EXPONENTIAL BACKOFF & STRUCTURED JSON)
+    // =========================================================================
+    async function callGeminiJSON({ systemInstruction, userPrompt, responseSchema, buttonEl, loadingText }) {
+      const effectiveKey = getEffectiveApiKey();
+      const primaryModel = appState.model || 'gemini-2.5-flash';
+      const fallbackModel = 'gemini-3-flash-preview';
+
+      let originalBtnHTML = '';
+      if (buttonEl) {
+        originalBtnHTML = buttonEl.innerHTML;
+        buttonEl.disabled = true;
+        buttonEl.classList.add('opacity-75', 'cursor-not-allowed');
+        buttonEl.innerHTML = `<svg class="animate-spin w-4 h-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>${escapeHTML(loadingText || 'Analyzing...')}</span>`;
+      }
+
+      const payload = {
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        generationConfig: {
+          responseMimeType: 'application/json',
+          responseSchema: responseSchema,
+          temperature: 0.4
+        }
+      };
+
+      const attemptRequest = async (modelName) => {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${effectiveKey}`;
+        const delays = [1000, 2000, 4000];
+        for (let attempt = 0; attempt <= delays.length; attempt++) {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (response.ok) {
+            return await response.json();
+          }
+
+          if (response.status === 404 && modelName !== fallbackModel) {
+            throw new Error('MODEL_NOT_FOUND');
+          }
+
+          if ((response.status === 429 || response.status >= 500) && attempt < delays.length) {
+            await new Promise(r => setTimeout(r, delays[attempt]));
+            continue;
+          }
+
+          const errBody = await response.json().catch(() => ({}));
+          const errMsg = errBody?.error?.message || `HTTP ${response.status}`;
+          throw new Error(errMsg);
+        }
+      };
+
+      try {
+        let data;
+        try {
+          data = await attemptRequest(primaryModel);
+        } catch (err) {
+          if (err.message === 'MODEL_NOT_FOUND') {
+            data = await attemptRequest(fallbackModel);
+          } else {
+            throw err;
+          }
+        }
+
+        const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawText) throw new Error('Empty response received from Gemini.');
+        return JSON.parse(rawText);
+      } catch (error) {
+        const msg = error.message || '';
+        if (msg.includes('API key') || msg.includes('400') || msg.includes('403') || msg.includes('PERMISSION_DENIED')) {
+          showToast('Please add your free Google AI Studio API Key in Settings.', 'warning');
+          openSettingsModal();
+        } else {
+          showToast(`AI Error: ${msg}`, 'error');
+        }
+        return null;
+      } finally {
+        if (buttonEl) {
+          buttonEl.disabled = false;
+          buttonEl.classList.remove('opacity-75', 'cursor-not-allowed');
+          buttonEl.innerHTML = originalBtnHTML;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    // =========================================================================
+    // 4. OFFICIAL IELTS BAND CALCULATOR & RAW (/40) CONVERTER
+    // =========================================================================
+    let rawConverterType = 'listening';
+
+    function roundOfficialIELTS(average) {
+      const whole = Math.floor(average);
+      const frac = +(average - whole).toFixed(4);
+      if (frac < 0.25) return whole;
+      if (frac < 0.75) return whole + 0.5;
+      return whole + 1.0;
+    }
+
+    function getBandMeta(band) {
+      if (band >= 8.5) return { cefr: 'CEFR C2', desc: 'Expert User — Operational command with complete accuracy' };
+      if (band >= 7.5) return { cefr: 'CEFR C1+', desc: 'Very Good User — Handles complex detailed argumentation well' };
+      if (band >= 7.0) return { cefr: 'CEFR C1', desc: 'Good User — Operational command with occasional inaccuracies' };
+      if (band >= 6.0) return { cefr: 'CEFR B2', desc: 'Competent User — Effective command despite some inaccuracies' };
+      if (band >= 5.0) return { cefr: 'CEFR B1', desc: 'Modest User — Partial command, copes with overall meaning' };
+      return { cefr: 'CEFR A2/B1', desc: 'Limited User — Basic competence in familiar situations' };
+    }
+
+    function updateBandCalculator() {
+      const l = parseFloat(document.getElementById('calc-listening').value);
+      const r = parseFloat(document.getElementById('calc-reading').value);
+      const w = parseFloat(document.getElementById('calc-writing').value);
+      const s = parseFloat(document.getElementById('calc-speaking').value);
+
+      document.getElementById('calc-listening-val').textContent = l.toFixed(1);
+      document.getElementById('calc-reading-val').textContent = r.toFixed(1);
+      document.getElementById('calc-writing-val').textContent = w.toFixed(1);
+      document.getElementById('calc-speaking-val').textContent = s.toFixed(1);
+
+      const mean = (l + r + w + s) / 4;
+      const overall = roundOfficialIELTS(mean);
+      const meta = getBandMeta(overall);
+
+      document.getElementById('calc-overall-result').textContent = overall.toFixed(1);
+      document.getElementById('calc-cefr-pill').textContent = meta.cefr;
+      document.getElementById('calc-descriptor').textContent = meta.desc.split('—')[0].trim();
+      document.getElementById('calc-formula-text').textContent =
+        `Mean: (${l.toFixed(1)} + ${r.toFixed(1)} + ${w.toFixed(1)} + ${s.toFixed(1)}) / 4 = ${mean.toFixed(2)} → Band ${overall.toFixed(1)}`;
+    }
+
+    function syncCalculatorFromMocks() {
+      const avg = arr => arr.length ? roundOfficialIELTS(arr.reduce((a, b) => a + b, 0) / arr.length) : null;
+      const l = avg(appState.stats.listeningScores);
+      const r = avg(appState.stats.readingScores);
+      const w = avg(appState.stats.writingScores);
+      const s = avg(appState.stats.speakingScores);
+
+      if (l === null && r === null && w === null && s === null) {
+        showToast('Complete at least one AI mock test first to sync your scores!', 'info');
+        return;
+      }
+      if (l !== null) document.getElementById('calc-listening').value = l;
+      if (r !== null) document.getElementById('calc-reading').value = r;
+      if (w !== null) document.getElementById('calc-writing').value = w;
+      if (s !== null) document.getElementById('calc-speaking').value = s;
+      updateBandCalculator();
+      showToast('Synced your recorded mock averages into the calculator!', 'success');
+    }
+
+    // Official IELTS Raw Score (/40) Tables
+    function convertRawScoreToBand(raw, type) {
+      const score = Math.max(0, Math.min(40, parseInt(raw, 10) || 0));
+      if (type === 'listening') {
+        if (score >= 39) return 9.0;
+        if (score >= 37) return 8.5;
+        if (score >= 35) return 8.0;
+        if (score >= 32) return 7.5;
+        if (score >= 30) return 7.0;
+        if (score >= 26) return 6.5;
+        if (score >= 23) return 6.0;
+        if (score >= 18) return 5.5;
+        if (score >= 16) return 5.0;
+        if (score >= 13) return 4.5;
+        if (score >= 10) return 4.0;
+        return 3.5;
+      } else if (type === 'academic') {
+        if (score >= 39) return 9.0;
+        if (score >= 37) return 8.5;
+        if (score >= 35) return 8.0;
+        if (score >= 33) return 7.5;
+        if (score >= 30) return 7.0;
+        if (score >= 27) return 6.5;
+        if (score >= 23) return 6.0;
+        if (score >= 19) return 5.5;
+        if (score >= 15) return 5.0;
+        if (score >= 13) return 4.5;
+        if (score >= 10) return 4.0;
+        return 3.5;
+      } else {
+        // General Training Reading
+        if (score >= 40) return 9.0;
+        if (score >= 39) return 8.5;
+        if (score >= 37) return 8.0;
+        if (score >= 36) return 7.5;
+        if (score >= 34) return 7.0;
+        if (score >= 32) return 6.5;
+        if (score >= 30) return 6.0;
+        if (score >= 27) return 5.5;
+        if (score >= 23) return 5.0;
+        if (score >= 19) return 4.5;
+        if (score >= 15) return 4.0;
+        return 3.5;
+      }
+    }
+
+    function setRawConverterType(type) {
+      rawConverterType = type;
+      document.querySelectorAll('.raw-type-btn').forEach(btn => {
+        btn.className = 'raw-type-btn py-2 px-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all';
+      });
+      document.getElementById(`raw-type-${type}`).className =
+        'raw-type-btn py-2 px-2 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-sm transition-all';
+
+      const labels = {
+        listening: 'IELTS Listening Band',
+        academic: 'Academic Reading Band',
+        general: 'General Reading Band'
+      };
+      document.getElementById('raw-module-label').textContent = labels[type];
+      updateRawConverter(document.getElementById('raw-score-slider').value);
+    }
+
+    function updateRawConverter(val) {
+      const clamped = Math.max(0, Math.min(40, parseInt(val, 10) || 0));
+      document.getElementById('raw-score-slider').value = clamped;
+      document.getElementById('raw-score-input').value = clamped;
+
+      const band = convertRawScoreToBand(clamped, rawConverterType);
+      document.getElementById('raw-converted-band').textContent = band.toFixed(1);
+
+      // Find next threshold
+      let nextRaw = null;
+      for (let r = clamped + 1; r <= 40; r++) {
+        if (convertRawScoreToBand(r, rawConverterType) > band) {
+          nextRaw = r;
+          break;
+        }
+      }
+      document.getElementById('raw-next-threshold').textContent =
+        nextRaw ? `${nextRaw}/40 needed for Band ${(band + 0.5).toFixed(1)}` : 'Maximum Band 9.0 achieved!';
+    }
+
+    function applyRawToCalculator() {
+      const band = parseFloat(document.getElementById('raw-converted-band').textContent);
+      if (rawConverterType === 'listening') {
+        document.getElementById('calc-listening').value = band;
+      } else {
+        document.getElementById('calc-reading').value = band;
+      }
+      updateBandCalculator();
+      showToast(`Applied Band ${band.toFixed(1)} to ${rawConverterType === 'listening' ? 'Listening' : 'Reading'}!`, 'success');
+    }
+
+    function renderDashboardStats() {
+      const s = appState.stats;
+      const allScores = [...s.writingScores, ...s.speakingScores, ...s.readingScores, ...s.listeningScores];
+      const avgAll = allScores.length ? roundOfficialIELTS(allScores.reduce((a, b) => a + b, 0) / allScores.length) : null;
+
+      document.getElementById('stat-avg-band').textContent = avgAll !== null ? avgAll.toFixed(1) : '—';
+      document.getElementById('sidebar-avg-band').textContent = avgAll !== null ? `Band ${avgAll.toFixed(1)}` : '—';
+      document.getElementById('sidebar-xp-badge').textContent = `${s.vocabXP} Vocab XP`;
+
+      const cefrBadge = document.getElementById('stat-cefr-badge');
+      if (avgAll !== null) {
+        cefrBadge.textContent = getBandMeta(avgAll).cefr;
+        cefrBadge.className = 'text-xs font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700';
+      } else {
+        cefrBadge.textContent = 'No Mocks Yet';
+        cefrBadge.className = 'text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600';
+      }
+
+      document.getElementById('stat-writing-count').textContent = s.writingScores.length;
+      document.getElementById('stat-writing-last').textContent = s.writingScores.length
+        ? `Latest: ${s.writingScores[s.writingScores.length - 1].toFixed(1)}`
+        : 'Latest: —';
+
+      document.getElementById('stat-speaking-count').textContent = s.speakingScores.length;
+      document.getElementById('stat-speaking-last').textContent = s.speakingScores.length
+        ? `Latest: ${s.speakingScores[s.speakingScores.length - 1].toFixed(1)}`
+        : 'Latest: —';
+
+      document.getElementById('stat-vocab-xp').textContent = s.vocabXP;
+      document.getElementById('stat-vocab-best').textContent = `Best: ${s.vocabBest}`;
+
+      // Render history list
+      const historyEl = document.getElementById('history-list');
+      if (!s.history.length) {
+        historyEl.innerHTML = `<div class="text-center py-8 text-xs text-slate-400 bg-slate-50/70 rounded-xl border border-dashed border-slate-200">No evaluated sessions yet. Try grading a Writing essay or Speaking session!</div>`;
+      } else {
+        historyEl.innerHTML = s.history.slice(-6).reverse().map(item => `
+          <div class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200/70">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold uppercase ${item.type === 'Writing' ? 'bg-emerald-100 text-emerald-800' : item.type === 'Speaking' ? 'bg-violet-100 text-violet-800' : 'bg-indigo-100 text-indigo-800'}">${escapeHTML(item.type)}</span>
+              <div class="truncate">
+                <p class="text-xs font-bold text-slate-800 truncate">${escapeHTML(item.title)}</p>
+                <p class="text-[11px] text-slate-400">${escapeHTML(item.date)}</p>
+              </div>
+            </div>
+            <span class="font-mono text-sm font-black text-indigo-700 bg-white px-3 py-1 rounded-lg border border-slate-200 shrink-0">Band ${Number(item.band).toFixed(1)}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    function confirmClearStats() {
+      showConfirmModal(
+        'Reset Practice History?',
+        'This will clear all stored Writing, Speaking, Reading/Listening scores, and Vocab XP from this browser.',
+        () => {
+          appState.stats = { ...defaultStats, history: [], writingScores: [], speakingScores: [], readingScores: [], listeningScores: [] };
+          saveStats();
+          showToast('Practice history has been reset.', 'info');
+        }
+      );
+    }
+
+    // =========================================================================
+    // 5. AI WRITING EXAMINER (TASK 1 & TASK 2)
+    // =========================================================================
+    const CURATED_WRITING_PROMPTS = {
+      task2: [
+        {
+          theme: 'Technology & Employment',
+          prompt: 'Some people believe that artificial intelligence will replace most human jobs in the near future, leading to widespread unemployment. Others argue that it will create new opportunities and improve overall living standards. Discuss both these views and give your own opinion.'
+        },
+        {
+          theme: 'Environment & Taxation',
+          prompt: 'International air travel is a major contributor to carbon emissions. Some argue that governments should impose heavy taxes on flights to discourage unnecessary travel, while others believe alternative green technologies should be funded instead. Discuss both views and give your opinion.'
+        },
+        {
+          theme: 'Education & Curriculum',
+          prompt: 'In many countries, universities are placing greater emphasis on science, technology, engineering, and mathematics (STEM) subjects at the expense of arts and humanities. Is this a positive or negative development?'
+        },
+        {
+          theme: 'Urbanization & Housing',
+          prompt: 'As cities continue to expand rapidly, many governments face a choice between building high-rise apartment blocks in city centers or developing new towns in surrounding rural areas. Which approach do you think is more advantageous?'
+        }
+      ],
+      task1: [
+        {
+          theme: 'Academic Line Graph',
+          prompt: 'The line graph below shows the percentage of households with high-speed internet access across four European countries (Germany, France, Spain, and Sweden) between 2005 and 2025. Summarize the information by selecting and reporting the main features, and make comparisons where relevant.'
+        },
+        {
+          theme: 'Academic Bar Chart',
+          prompt: 'The bar chart compares the proportion of municipal waste recycled, incinerated, and sent to landfills in five developed nations in 2024. Summarize the information by selecting and reporting the main features, and make comparisons where relevant.'
+        },
+        {
+          theme: 'General Training Formal Letter',
+          prompt: 'You recently attended a three-day international conference hosted by a university in another city, but you were dissatisfied with the accommodation and schedule organization. Write a formal letter to the conference organizer explaining the problems and suggesting improvements for future events.'
+        }
+      ]
+    };
+
+    function setWritingTask(task) {
+      appState.writingTask = task;
+      appState.writingPromptIdx = 0;
+
+      document.getElementById('btn-writing-task2').className = task === 'task2'
+        ? 'px-4 py-2 rounded-lg text-xs font-extrabold bg-white text-indigo-700 shadow-sm transition-all'
+        : 'px-4 py-2 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition-all';
+      document.getElementById('btn-writing-task1').className = task === 'task1'
+        ? 'px-4 py-2 rounded-lg text-xs font-extrabold bg-white text-indigo-700 shadow-sm transition-all'
+        : 'px-4 py-2 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition-all';
+
+      document.getElementById('writing-prompt-badge').textContent =
+        task === 'task2' ? 'IELTS Academic Writing Task 2' : 'IELTS Writing Task 1';
+      document.getElementById('writing-word-target').textContent =
+        task === 'task2' ? ' / 250 min words' : ' / 150 min words';
+
+      resetWritingTimer();
+      loadCuratedWritingPrompt(true);
+      updateWritingWordCount();
+    }
+
+    function loadCuratedWritingPrompt(keepIndex = false) {
+      const list = CURATED_WRITING_PROMPTS[appState.writingTask];
+      if (!keepIndex) {
+        appState.writingPromptIdx = (appState.writingPromptIdx + 1) % list.length;
+      }
+      const item = list[appState.writingPromptIdx];
+      document.getElementById('writing-prompt-theme').textContent = `Theme: ${item.theme}`;
+      document.getElementById('writing-prompt-text').textContent = item.prompt;
+    }
+
+    async function generateAIWritingPrompt() {
+      const btn = document.getElementById('btn-ai-topic');
+      const taskLabel = appState.writingTask === 'task2' ? 'IELTS Academic Writing Task 2 essay prompt' : 'IELTS Academic Writing Task 1 data/process description prompt';
+      const res = await callGeminiJSON({
+        systemInstruction: 'You are an official Cambridge IELTS test writer. Generate a realistic, authentic exam prompt.',
+        userPrompt: `Generate one authentic ${taskLabel} on a contemporary academic topic.`,
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            theme: { type: 'STRING' },
+            prompt: { type: 'STRING' }
+          },
+          required: ['theme', 'prompt']
+        },
+        buttonEl: btn,
+        loadingText: 'Generating...'
+      });
+
+      if (res && res.prompt) {
+        document.getElementById('writing-prompt-theme').textContent = `Theme: ${res.theme}`;
+        document.getElementById('writing-prompt-text').textContent = res.prompt;
+        showToast('Fresh IELTS prompt generated!', 'success');
+      }
+    }
+
+    function updateWritingWordCount() {
+      const text = document.getElementById('writing-essay-input').value.trim();
+      const words = text ? text.split(/\s+/).length : 0;
+      const minWords = appState.writingTask === 'task2' ? 250 : 150;
+      document.getElementById('writing-word-count').textContent = words;
+
+      const pct = Math.min(100, Math.round((words / minWords) * 100));
+      const bar = document.getElementById('writing-word-bar');
+      bar.style.width = `${pct}%`;
+      bar.className = words >= minWords
+        ? 'h-full bg-emerald-500 transition-all duration-200'
+        : 'h-full bg-amber-500 transition-all duration-200';
+    }
+
+    function toggleWritingTimer() {
+      const btn = document.getElementById('writing-timer-btn');
+      if (appState.writingTimerInterval) {
+        clearInterval(appState.writingTimerInterval);
+        appState.writingTimerInterval = null;
+        btn.textContent = 'Resume Timer';
+      } else {
+        btn.textContent = 'Pause';
+        appState.writingTimerInterval = setInterval(() => {
+          if (appState.writingTimerSeconds <= 0) {
+            clearInterval(appState.writingTimerInterval);
+            appState.writingTimerInterval = null;
+            btn.textContent = 'Time Up';
+            showToast('Exam time has expired! Submit your essay for grading.', 'warning');
+            return;
+          }
+          appState.writingTimerSeconds--;
+          renderWritingTimer();
+        }, 1000);
+      }
+    }
+
+    function resetWritingTimer() {
+      if (appState.writingTimerInterval) {
+        clearInterval(appState.writingTimerInterval);
+        appState.writingTimerInterval = null;
+      }
+      appState.writingTimerSeconds = appState.writingTask === 'task2' ? 40 * 60 : 20 * 60;
+      document.getElementById('writing-timer-btn').textContent = 'Start Timer';
+      renderWritingTimer();
+    }
+
+    function renderWritingTimer() {
+      const mins = Math.floor(appState.writingTimerSeconds / 60);
+      const secs = appState.writingTimerSeconds % 60;
+      document.getElementById('writing-timer-display').textContent =
+        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function insertSampleEssay() {
+      setWritingTask('task2');
+      appState.writingPromptIdx = 0;
+      loadCuratedWritingPrompt(true);
+      document.getElementById('writing-essay-input').value =
+        `In recent years, rapid advancements in artificial intelligence have sparked intense debate regarding the future of human employment. While some individuals fear that automation will trigger mass joblessness, others contend that technological progress historically generates novel industries and elevates living standards. I strongly believe that although short-term disruption is inevitable, AI will ultimately augment human productivity rather than cause permanent unemployment.\n\nOn the one hand, concerns about job displacement are well-founded, particularly in sectors reliant on routine cognitive or manual labor. Automated customer service agents, algorithmic data processors, and autonomous logistics systems can already perform repetitive tasks faster and more cheaply than human workers. Consequently, without timely retraining initiatives, millions of clerical and manufacturing employees could face prolonged economic insecurity.\n\nOn the other hand, historical industrial revolutions demonstrate that transformative technologies create entirely new categories of work. Just as the advent of personal computing gave rise to software engineering and digital marketing, artificial intelligence is already driving demand for machine learning auditors, AI ethicists, and specialized healthcare analysts. Furthermore, by automating mundane administrative duties, AI enables professionals to focus on complex problem-solving, interpersonal empathy, and creative innovation.\n\nIn conclusion, while artificial intelligence will undoubtedly reshape the labor market and render certain repetitive roles obsolete, its net impact is likely to be positive if governments invest in lifelong education. Therefore, society should embrace AI as a catalyst for higher-value human work rather than fear it.`;
+      updateWritingWordCount();
+      showToast('Sample Band 7.5+ essay inserted. Click "Evaluate Essay with AI" to test!', 'info');
+    }
+
+    function copyWritingText() {
+      const el = document.getElementById('writing-essay-input');
+      if (!el.value.trim()) return;
+      el.select();
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      showToast('Essay copied to clipboard!', 'success');
+    }
+
+    function copyBand85Rewrite() {
+      if (!appState.lastBand85Rewrite) return;
+      const temp = document.createElement('textarea');
+      temp.value = appState.lastBand85Rewrite;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      temp.remove();
+      showToast('Band 8.5+ rewrite copied to clipboard!', 'success');
+    }
+
+    async function evaluateWritingWithAI() {
+      const promptText = document.getElementById('writing-prompt-text').textContent.trim();
+      const essayText = document.getElementById('writing-essay-input').value.trim();
+      const wordCount = essayText ? essayText.split(/\s+/).length : 0;
+
+      if (wordCount < 35) {
+        showToast('Please write at least 35 words before requesting an AI evaluation.', 'warning');
+        return;
+      }
+
+      const btn = document.getElementById('btn-evaluate-writing');
+      const taskName = appState.writingTask === 'task2' ? 'Writing Task 2' : 'Writing Task 1';
+
+      const schema = {
+        type: 'OBJECT',
+        properties: {
+          overallBand: { type: 'NUMBER' },
+          examinerSummary: { type: 'STRING' },
+          criteria: {
+            type: 'ARRAY',
+            items: {
+              type: 'OBJECT',
+              properties: {
+                name: { type: 'STRING' },
+                score: { type: 'NUMBER' },
+                strength: { type: 'STRING' },
+                improvement: { type: 'STRING' }
+              },
+              required: ['name', 'score', 'strength', 'improvement']
+            }
+          },
+          corrections: {
+            type: 'ARRAY',
+            items: {
+              type: 'OBJECT',
+              properties: {
+                original: { type: 'STRING' },
+                improved: { type: 'STRING' },
+                explanation: { type: 'STRING' }
+              },
+              required: ['original', 'improved', 'explanation']
+            }
+          },
+          band85Rewrite: { type: 'STRING' }
+        },
+        required: ['overallBand', 'examinerSummary', 'criteria', 'corrections', 'band85Rewrite']
+      };
+
+      const result = await callGeminiJSON({
+        systemInstruction: `You are a certified senior IELTS Writing Examiner. Grade strictly according to the official public IELTS Writing Band Descriptors (0.0 to 9.0 in 0.5 increments). Penalize under-length essays (Task 1 < 150 words, Task 2 < 250 words). Return exactly 4 criteria items: "Task Achievement / Response", "Coherence & Cohesion", "Lexical Resource", and "Grammatical Range & Accuracy". Provide 3 to 5 specific sentence-level corrections and a full Band 8.5+ model rewrite preserving the candidate's core stance.`,
+        userPrompt: `Task Type: ${taskName}\nWord Count: ${wordCount}\nPrompt: ${promptText}\n\nCandidate Response:\n${essayText}`,
+        responseSchema: schema,
+        buttonEl: btn,
+        loadingText: 'Grading Essay...'
+      });
+
+      if (!result) return;
+
+      // Render Results
+      const overall = roundOfficialIELTS(Number(result.overallBand) || 6.5);
+      document.getElementById('writing-res-overall').textContent = overall.toFixed(1);
+      document.getElementById('writing-examiner-summary').textContent = result.examinerSummary;
+
+      document.getElementById('writing-criteria-grid').innerHTML = (result.criteria || []).map(c => `
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-900">${escapeHTML(c.name)}</span>
+            <span class="font-mono text-sm font-black px-2.5 py-0.5 rounded-lg bg-indigo-600 text-white">${Number(c.score).toFixed(1)}</span>
+          </div>
+          <p class="text-xs text-emerald-700 leading-relaxed"><strong>Strength:</strong> ${escapeHTML(c.strength)}</p>
+          <p class="text-xs text-slate-600 leading-relaxed"><strong>To Reach Band 8+:</strong> ${escapeHTML(c.improvement)}</p>
+        </div>
+      `).join('');
+
+      document.getElementById('writing-corrections-list').innerHTML = (result.corrections || []).map(item => `
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1.5 text-xs">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span class="line-through text-rose-600 bg-rose-50 px-2 py-1 rounded">${escapeHTML(item.original)}</span>
+            <span class="hidden sm:inline text-slate-400">→</span>
+            <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded">${escapeHTML(item.improved)}</span>
+          </div>
+          <p class="text-slate-500 pt-1">${escapeHTML(item.explanation)}</p>
+        </div>
+      `).join('');
+
+      appState.lastBand85Rewrite = result.band85Rewrite || '';
+      document.getElementById('writing-band85-text').textContent = appState.lastBand85Rewrite;
+
+      const resContainer = document.getElementById('writing-result-container');
+      resContainer.classList.remove('hidden');
+      resContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Persist Score
+      appState.stats.writingScores.push(overall);
+      appState.stats.history.push({
+        type: 'Writing',
+        title: `${taskName}: ${promptText.slice(0, 48)}...`,
+        band: overall,
+        date: new Date().toLocaleDateString()
+      });
+      saveStats();
+      showToast(`Essay graded: Band ${overall.toFixed(1)}!`, 'success');
+    }
+
+    // =========================================================================
+    // 6. AI SPEAKING EXAMINER (WEB SPEECH API VOICE + TEXT)
+    // =========================================================================
+    const SPEAKING_PROMPTS = {
+      part1: [
+        "Let's talk about your hometown or where you currently live. What do you find most interesting about the area you live in?",
+        "How do you usually spend your weekends, and has that changed compared to a few years ago?",
+        "Do you prefer reading digital articles on a screen or physical books, and why?",
+        "What kind of music or podcasts do you enjoy listening to when you want to relax?"
+      ],
+      part2: [
+        {
+          question: "Describe a piece of technology or software that has significantly improved your daily productivity.",
+          bullets: [
+            "What the technology or software is",
+            "How you first discovered it",
+            "How frequently you use it in your daily routine",
+            "And explain why it has had such a positive impact on your productivity."
+          ]
+        },
+        {
+          question: "Describe a memorable journey or trip you took that taught you something new.",
+          bullets: [
+            "Where you went and who you travelled with",
+            "What you did during this journey",
+            "Any unexpected challenges you faced",
+            "And explain why this experience remains memorable to you."
+          ]
+        }
+      ],
+      part3: [
+        "In what ways has modern communication technology altered the depth of personal relationships in society?",
+        "Should governments subsidize public transportation to discourage private car ownership in major cities?",
+        "Why do some traditional skills disappear over generations, and is it important for societies to preserve them?"
+      ]
+    };
+
+    function setSpeakingPart(part) {
+      appState.speakingPart = part;
+      appState.speakingPromptIdx = 0;
+
+      ['part1', 'part2', 'part3'].forEach(p => {
+        document.getElementById(`sp-btn-${p}`).className = p === part
+          ? 'px-3.5 py-2 rounded-lg text-xs font-extrabold bg-white text-indigo-700 shadow-sm transition-all'
+          : 'px-3.5 py-2 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition-all';
+      });
+
+      const labels = {
+        part1: 'IELTS Speaking Part 1 • Introduction & Interview',
+        part2: 'IELTS Speaking Part 2 • Individual Long Turn',
+        part3: 'IELTS Speaking Part 3 • Two-Way Discussion'
+      };
+      document.getElementById('speaking-part-label').textContent = labels[part];
+      renderCurrentSpeakingPrompt(false);
+    }
+
+    function nextSpeakingPrompt() {
+      const list = SPEAKING_PROMPTS[appState.speakingPart];
+      appState.speakingPromptIdx = (appState.speakingPromptIdx + 1) % list.length;
+      renderCurrentSpeakingPrompt(true);
+    }
+
+    function renderCurrentSpeakingPrompt(autoSpeak = true) {
+      const part = appState.speakingPart;
+      const item = SPEAKING_PROMPTS[part][appState.speakingPromptIdx];
+      const cueBox = document.getElementById('speaking-cue-card');
+
+      if (part === 'part2') {
+        document.getElementById('speaking-question-text').textContent = item.question;
+        document.getElementById('speaking-cue-bullets').innerHTML = item.bullets
+          .map(b => `<li>${escapeHTML(b)}</li>`).join('');
+        cueBox.classList.remove('hidden');
+      } else {
+        document.getElementById('speaking-question-text').textContent = item;
+        cueBox.classList.add('hidden');
+      }
+
+      if (autoSpeak && appState.voiceEnabled) {
+        speakCurrentQuestion();
+      }
+    }
+
+    function speakTextAloud(text, rate = 1.0, onEndCallback = null) {
+      if (!('speechSynthesis' in window)) {
+        showToast('Text-to-Speech is not supported in this browser.', 'warning');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = appState.accent;
+      utterance.rate = rate;
+
+      const voices = window.speechSynthesis.getVoices();
+      const matched = voices.find(v => v.lang.includes(appState.accent)) || voices.find(v => v.lang.startsWith('en'));
+      if (matched) utterance.voice = matched;
+
+      const wave = document.getElementById('examiner-wave');
+      utterance.onstart = () => { if (wave) wave.classList.remove('hidden'); };
+      utterance.onend = () => {
+        if (wave) wave.classList.add('hidden');
+        if (onEndCallback) onEndCallback();
+      };
+      utterance.onerror = () => {
+        if (wave) wave.classList.add('hidden');
+      };
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function speakCurrentQuestion() {
+      const q = document.getElementById('speaking-question-text').textContent;
+      speakTextAloud(q, 1.0);
+    }
+
+    function startCueCardTimer(mode) {
+      if (appState.cueTimerInterval) clearInterval(appState.cueTimerInterval);
+      let secs = mode === 'prep' ? 60 : 120;
+      const display = document.getElementById('cue-card-timer');
+      const updateDisp = () => {
+        const m = Math.floor(secs / 60);
+        const s = secs % 60;
+        display.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      };
+      updateDisp();
+      showToast(mode === 'prep' ? '60s preparation started — jot down key points!' : '2-minute speaking timer started!', 'info');
+
+      appState.cueTimerInterval = setInterval(() => {
+        secs--;
+        updateDisp();
+        if (secs <= 0) {
+          clearInterval(appState.cueTimerInterval);
+          appState.cueTimerInterval = null;
+          showToast(mode === 'prep' ? 'Prep time finished! Begin speaking now.' : '2 minutes reached! Great job.', 'warning');
+        }
+      }, 1000);
+    }
+
+    function toggleSpeechRecognition() {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        showToast('Live Microphone Speech-to-Text is unavailable in this browser. Please type your response directly.', 'warning');
+        document.getElementById('speaking-answer-input').focus();
+        return;
+      }
+
+      const btn = document.getElementById('btn-mic-record');
+      const label = document.getElementById('mic-btn-label');
+      const statusBadge = document.getElementById('speech-status-badge');
+
+      if (appState.isRecording && appState.recognition) {
+        appState.recognition.stop();
+        return;
+      }
+
+      const recognition = new SpeechRec();
+      recognition.lang = appState.accent;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      const inputEl = document.getElementById('speaking-answer-input');
+      const baseText = inputEl.value ? inputEl.value.trim() + ' ' : '';
+
+      recognition.onstart = () => {
+        appState.isRecording = true;
+        btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+        btn.classList.add('bg-rose-600', 'hover:bg-rose-700', 'mic-active');
+        label.textContent = 'Stop Recording';
+        statusBadge.textContent = 'Listening live... speak clearly into your mic';
+        statusBadge.className = 'text-xs font-bold text-rose-600';
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        inputEl.value = baseText + transcript;
+      };
+
+      recognition.onerror = (e) => {
+        showToast(`Microphone notice: ${e.error}. You can continue typing manually.`, 'warning');
+      };
+
+      recognition.onend = () => {
+        appState.isRecording = false;
+        btn.classList.remove('bg-rose-600', 'hover:bg-rose-700', 'mic-active');
+        btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+        label.textContent = 'Start Speaking';
+        statusBadge.textContent = 'Recording stopped. Edit text or submit turn.';
+        statusBadge.className = 'text-xs font-semibold text-slate-500';
+      };
+
+      appState.recognition = recognition;
+      recognition.start();
+    }
+
+    async function submitSpeakingTurn(askFollowUp = true) {
+      if (appState.isRecording && appState.recognition) {
+        appState.recognition.stop();
+      }
+      const q = document.getElementById('speaking-question-text').textContent.trim();
+      const a = document.getElementById('speaking-answer-input').value.trim();
+
+      if (!a) {
+        showToast('Speak or type an answer first before submitting.', 'warning');
+        return;
+      }
+
+      appState.speakingTurns.push({ part: appState.speakingPart.toUpperCase(), question: q, answer: a });
+      document.getElementById('speaking-answer-input').value = '';
+      renderSpeakingTurns();
+
+      if (!askFollowUp) return;
+
+      const btn = document.getElementById('btn-speaking-followup');
+      const res = await callGeminiJSON({
+        systemInstruction: 'You are an official IELTS Speaking Examiner. Based on the candidate’s previous answer, ask ONE natural, analytical follow-up question appropriate for the current IELTS Speaking part.',
+        userPrompt: `Current Part: ${appState.speakingPart}\nPrevious Question: ${q}\nCandidate Answer: ${a}`,
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            followUpQuestion: { type: 'STRING' }
+          },
+          required: ['followUpQuestion']
+        },
+        buttonEl: btn,
+        loadingText: 'Thinking...'
+      });
+
+      if (res && res.followUpQuestion) {
+        document.getElementById('speaking-cue-card').classList.add('hidden');
+        document.getElementById('speaking-question-text').textContent = res.followUpQuestion;
+        if (appState.voiceEnabled) speakCurrentQuestion();
+      }
+    }
+
+    function renderSpeakingTurns() {
+      const box = document.getElementById('speaking-transcript-box');
+      const list = document.getElementById('speaking-turns-list');
+      if (!appState.speakingTurns.length) {
+        box.classList.add('hidden');
+        return;
+      }
+      box.classList.remove('hidden');
+      list.innerHTML = appState.speakingTurns.map((t, idx) => `
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs space-y-1">
+          <p class="font-bold text-indigo-700">Q${idx + 1} (${escapeHTML(t.part)}): ${escapeHTML(t.question)}</p>
+          <p class="text-slate-700"><strong>You:</strong> ${escapeHTML(t.answer)}</p>
+        </div>
+      `).join('');
+    }
+
+    function resetSpeakingSession() {
+      appState.speakingTurns = [];
+      document.getElementById('speaking-answer-input').value = '';
+      document.getElementById('speaking-result-container').classList.add('hidden');
+      renderSpeakingTurns();
+      showToast('Speaking session cleared.', 'info');
+    }
+
+    async function evaluateSpeakingSession() {
+      // Include any unsaved current input
+      const currentAns = document.getElementById('speaking-answer-input').value.trim();
+      if (currentAns) {
+        const q = document.getElementById('speaking-question-text').textContent.trim();
+        appState.speakingTurns.push({ part: appState.speakingPart.toUpperCase(), question: q, answer: currentAns });
+        document.getElementById('speaking-answer-input').value = '';
+        renderSpeakingTurns();
+      }
+
+      if (!appState.speakingTurns.length) {
+        showToast('Record or type at least one answer before grading!', 'warning');
+        return;
+      }
+
+      const transcript = appState.speakingTurns
+        .map((t, i) => `Turn ${i + 1} [${t.part}]\nExaminer: ${t.question}\nCandidate: ${t.answer}`)
+        .join('\n\n');
+
+      const btn = document.getElementById('btn-evaluate-speaking');
+      const result = await callGeminiJSON({
+        systemInstruction: 'You are a certified IELTS Speaking Examiner. Grade the candidate transcript across the 4 official Speaking criteria: "Fluency & Coherence", "Lexical Resource", "Grammatical Range & Accuracy", and "Pronunciation & Phrasing Clarity". Also provide 3 natural Band 8.5+ idiomatic phrasing upgrades.',
+        userPrompt: `Evaluate this IELTS Speaking session transcript:\n\n${transcript}`,
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            overallBand: { type: 'NUMBER' },
+            summary: { type: 'STRING' },
+            criteria: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  name: { type: 'STRING' },
+                  score: { type: 'NUMBER' },
+                  feedback: { type: 'STRING' }
+                },
+                required: ['name', 'score', 'feedback']
+              }
+            },
+            upgrades: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  said: { type: 'STRING' },
+                  band8Alternative: { type: 'STRING' },
+                  why: { type: 'STRING' }
+                },
+                required: ['said', 'band8Alternative', 'why']
+              }
+            }
+          },
+          required: ['overallBand', 'summary', 'criteria', 'upgrades']
+        },
+        buttonEl: btn,
+        loadingText: 'Evaluating...'
+      });
+
+      if (!result) return;
+
+      const band = roundOfficialIELTS(Number(result.overallBand) || 6.5);
+      document.getElementById('speaking-res-overall').textContent = band.toFixed(1);
+      document.getElementById('speaking-res-summary').textContent = result.summary;
+
+      document.getElementById('speaking-criteria-grid').innerHTML = (result.criteria || []).map(c => `
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-900">${escapeHTML(c.name)}</span>
+            <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-violet-600 text-white">${Number(c.score).toFixed(1)}</span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">${escapeHTML(c.feedback)}</p>
+        </div>
+      `).join('');
+
+      document.getElementById('speaking-upgrades-list').innerHTML = (result.upgrades || []).map(u => `
+        <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-xs space-y-1">
+          <p class="text-slate-500">Original: <span class="italic">"${escapeHTML(u.said)}"</span></p>
+          <p class="font-bold text-emerald-800">Band 8.5+ Upgrade: "${escapeHTML(u.band8Alternative)}"</p>
+          <p class="text-slate-600">${escapeHTML(u.why)}</p>
+        </div>
+      `).join('');
+
+      const resEl = document.getElementById('speaking-result-container');
+      resEl.classList.remove('hidden');
+      resEl.scrollIntoView({ behavior: 'smooth' });
+
+      appState.stats.speakingScores.push(band);
+      appState.stats.history.push({
+        type: 'Speaking',
+        title: `Speaking ${appState.speakingPart.toUpperCase()} (${appState.speakingTurns.length} turns)`,
+        band: band,
+        date: new Date().toLocaleDateString()
+      });
+      saveStats();
+      showToast(`Speaking evaluated: Band ${band.toFixed(1)}!`, 'success');
+    }
+
+    // =========================================================================
+    // 7. AI LISTENING & READING LAB
+    // =========================================================================
+    const LAB_PRESETS = {
+      reading: [
+        {
+          title: 'The Evolution of Bioluminescence in Deep-Sea Ecosystems',
+          paragraphs: [
+            'Beneath the sunlit epipelagic zone of the world’s oceans lies a vast realm of perpetual darkness where solar radiation cannot penetrate. Remarkably, rather than being devoid of visual signals, roughly seventy-six percent of macroscopic marine organisms inhabiting the water column below 200 meters produce their own light through a biochemical reaction known as bioluminescence. This phenomenon relies on the oxidation of a light-emitting molecule called luciferin, catalyzed by the enzyme luciferase.',
+            'Evolutionary biologists have discovered that bioluminescence did not originate from a single common ancestor; instead, it evolved independently at least forty times across diverse marine lineages, ranging from dinoflagellates and jellyfish to deep-sea anglerfish. Such widespread convergent evolution underscores the immense adaptive utility of biological light in aphotic environments.',
+            'The ecological functions of marine luminescence are extraordinarily varied. Many mid-water species, such as the hatchetfish, utilize downward-pointing photophores along their bellies to match the faint residual light filtering from above—a camouflage strategy termed counter-illumination that erases their silhouette from predators lurking below. Conversely, certain dragonfish emit far-red light invisible to almost all other deep-sea fauna, effectively functioning as a private infrared spotlight for hunting prey undetected.'
+          ],
+          questions: [
+            {
+              q: '1. Approximately what proportion of macroscopic organisms below 200 meters exhibit bioluminescence?',
+              options: ['Around one-quarter', 'Roughly three-quarters', 'Nearly ninety percent', 'Only anglerfish and jellyfish'],
+              answer: 1,
+              explanation: 'Paragraph 1 explicitly states that "roughly seventy-six percent" (approx. three-quarters) of macroscopic organisms below 200m produce light.'
+            },
+            {
+              q: '2. TRUE / FALSE / NOT GIVEN: Bioluminescence in marine animals evolved from one single ancestral species.',
+              options: ['TRUE', 'FALSE', 'NOT GIVEN'],
+              answer: 1,
+              explanation: 'FALSE — Paragraph 2 states it "did not originate from a single common ancestor; instead, it evolved independently at least forty times."'
+            },
+            {
+              q: '3. What is the primary purpose of "counter-illumination" in hatchetfish?',
+              options: ['To attract mates during spawning', 'To hide their shadow from predators below', 'To blind approaching prey', 'To measure water depth'],
+              answer: 1,
+              explanation: 'Paragraph 3 explains that counter-illumination matches faint light from above so it "erases their silhouette from predators lurking below."'
+            },
+            {
+              q: '4. Why is the far-red light emitted by dragonfish particularly advantageous?',
+              options: ['It travels farther than blue light in seawater', 'It requires no luciferase enzyme', 'Other deep-sea animals cannot see it', 'It warms the surrounding water'],
+              answer: 2,
+              explanation: 'Paragraph 3 notes dragonfish emit far-red light "invisible to almost all other deep-sea fauna," acting as a private spotlight.'
+            }
+          ]
+        },
+        {
+          title: 'Urban Vertical Farming and Global Food Resilience',
+          paragraphs: [
+            'With the global urban population projected to exceed sixty-eight percent by 2050, traditional open-field agriculture faces mounting pressure from arable land depletion, freshwater scarcity, and supply-chain vulnerabilities. Vertical farming—the practice of cultivating crops in vertically stacked layers within controlled-environment buildings—has emerged as a compelling architectural and agronomic response.',
+            'By employing hydroponic or aeroponic nutrient delivery systems alongside precision LED lighting calibrated to specific photosynthetic wavelengths, vertical farms reduce water consumption by up to ninety-five percent compared to conventional soil farming. Furthermore, because indoor facilities eliminate exposure to seasonal frosts, droughts, and agricultural pests, crops can be harvested year-round without synthetic pesticides.',
+            'Nevertheless, skeptics point out that high capital expenditure and electricity demand remain formidable barriers. While leafy greens, herbs, and strawberries thrive economically in vertical installations, staple calorie crops such as wheat, maize, and rice require immense energy inputs per kilogram of yield, making them currently unviable indoors without abundant renewable energy.'
+          ],
+          questions: [
+            {
+              q: '1. By how much can vertical farming reduce water usage compared to conventional agriculture?',
+              options: ['Up to 50 percent', 'Up to 68 percent', 'Up to 95 percent', 'Water usage remains identical'],
+              answer: 2,
+              explanation: 'Paragraph 2 states vertical farms "reduce water consumption by up to ninety-five percent compared to conventional soil farming."'
+            },
+            {
+              q: '2. TRUE / FALSE / NOT GIVEN: Vertical farms require heavy pesticide use due to high humidity indoors.',
+              options: ['TRUE', 'FALSE', 'NOT GIVEN'],
+              answer: 1,
+              explanation: 'FALSE — Paragraph 2 notes indoor facilities eliminate pest exposure and crops are harvested "without synthetic pesticides."'
+            },
+            {
+              q: '3. Which category of crops is currently economically unviable in vertical farms?',
+              options: ['Leafy greens', 'Culinary herbs', 'Strawberries', 'Staple calorie grains like wheat and rice'],
+              answer: 3,
+              explanation: 'Paragraph 3 states that staple calorie crops such as wheat, maize, and rice are "currently unviable indoors."'
+            },
+            {
+              q: '4. What is identified as a primary obstacle to scaling vertical agriculture?',
+              options: ['Lack of consumer interest', 'High initial capital and electricity costs', 'Shortage of hydroponic nutrients', 'Excessive land taxes'],
+              answer: 1,
+              explanation: 'Paragraph 3 highlights "high capital expenditure and electricity demand" as formidable barriers.'
+            }
+          ]
+        }
+      ],
+      listening: [
+        {
+          title: 'Section 2 Monologue: University Library & Research Hub Orientation',
+          paragraphs: [
+            'Good morning everyone, and welcome to the Northfield University Main Library orientation. My name is Claire, and I am the Senior Academic Liaison Librarian. Before you explore the building, I would like to highlight several key services available to postgraduate and undergraduate researchers. First, our ground floor houses the Rapid Loan Collection, where core textbook copies can be borrowed for up to forty-eight hours. If you require quiet individual study, please head to the third floor, which is strictly designated as a silent zone—mobile phones must be switched off entirely, not merely placed on vibrate. For collaborative group projects, twelve soundproof media pods are available on the second floor; however, these must be reserved online at least twenty-four hours in advance using your student identification number. Finally, please note that our Saturday opening hours have recently been extended until nine o’clock in the evening during examination weeks.'
+          ],
+          questions: [
+            {
+              q: '1. How long can books from the ground-floor Rapid Loan Collection be borrowed?',
+              options: ['24 hours', '48 hours', '7 days', '14 days'],
+              answer: 1,
+              explanation: 'The speaker states core textbook copies can be borrowed for "up to forty-eight hours."'
+            },
+            {
+              q: '2. What rule applies to mobile phones on the third floor?',
+              options: ['They must be on vibrate mode', 'Calls are allowed near the stairs', 'They must be switched off completely', 'Only tablets are prohibited'],
+              answer: 2,
+              explanation: 'The speaker notes mobile phones "must be switched off entirely, not merely placed on vibrate."'
+            },
+            {
+              q: '3. How far in advance must group media pods on the second floor be booked?',
+              options: ['2 hours', '12 hours', '24 hours', '1 week'],
+              answer: 2,
+              explanation: 'Pods "must be reserved online at least twenty-four hours in advance."'
+            },
+            {
+              q: '4. Until what time is the library open on Saturdays during exam weeks?',
+              options: ['5:00 PM', '7:00 PM', '9:00 PM', 'Midnight'],
+              answer: 2,
+              explanation: 'Saturday opening hours have been extended "until nine o’clock in the evening during examination weeks."'
+            }
+          ]
+        }
+      ]
+    };
+
+    function setLabMode(mode) {
+      stopListeningAudio();
+      appState.labMode = mode;
+      appState.labPresetIdx = 0;
+      appState.transcriptVisible = false;
+
+      document.getElementById('lab-btn-reading').className = mode === 'reading'
+        ? 'px-4 py-2 rounded-lg text-xs font-extrabold bg-white text-indigo-700 shadow-sm transition-all flex items-center gap-1.5'
+        : 'px-4 py-2 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5';
+      document.getElementById('lab-btn-listening').className = mode === 'listening'
+        ? 'px-4 py-2 rounded-lg text-xs font-extrabold bg-white text-indigo-700 shadow-sm transition-all flex items-center gap-1.5'
+        : 'px-4 py-2 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5';
+
+      loadLabPreset();
+    }
+
+    function cycleLabPreset() {
+      stopListeningAudio();
+      const list = LAB_PRESETS[appState.labMode];
+      appState.labPresetIdx = (appState.labPresetIdx + 1) % list.length;
+      loadLabPreset();
+    }
+
+    function loadLabPreset() {
+      const list = LAB_PRESETS[appState.labMode];
+      appState.currentLabData = list[appState.labPresetIdx % list.length];
+      renderLabContent();
+    }
+
+    function renderLabContent() {
+      const data = appState.currentLabData;
+      if (!data) return;
+
+      const isListening = appState.labMode === 'listening';
+      document.getElementById('lab-badge').textContent = isListening
+        ? 'IELTS Listening Simulator (Audio Comprehension)'
+        : 'IELTS Academic Reading Passage';
+      document.getElementById('lab-title').textContent = data.title;
+      document.getElementById('lab-score-pill').classList.add('hidden');
+
+      const playerBox = document.getElementById('listening-player-box');
+      const passageBox = document.getElementById('lab-passage-container');
+
+      if (isListening) {
+        playerBox.classList.remove('hidden');
+        document.getElementById('btn-toggle-transcript').textContent = appState.transcriptVisible ? 'Hide Script' : 'Show Script';
+        if (appState.transcriptVisible) {
+          passageBox.innerHTML = data.paragraphs.map(p => `<p class="p-4 rounded-xl bg-slate-50 border border-slate-200">${escapeHTML(p)}</p>`).join('');
+        } else {
+          passageBox.innerHTML = `<div class="p-8 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-2">
+            <p class="text-xs font-bold text-slate-700">Audio Transcript Hidden (Exam Mode)</p>
+            <p class="text-xs text-slate-500">Click <strong>Play Audio</strong> above to listen to the recording and answer Questions 1–4 on the right. You can reveal the script afterwards to review.</p>
+          </div>`;
+        }
+      } else {
+        playerBox.classList.add('hidden');
+        passageBox.innerHTML = data.paragraphs.map(p => `<p>${escapeHTML(p)}</p>`).join('');
+      }
+
+      // Render Questions
+      document.getElementById('lab-questions-list').innerHTML = data.questions.map((item, qIdx) => `
+        <div id="lab-q-card-${qIdx}" class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+          <p class="text-xs font-extrabold text-slate-900 leading-snug">${escapeHTML(item.q)}</p>
+          <div class="space-y-1.5">
+            ${item.options.map((opt, oIdx) => `
+              <label class="flex items-center gap-2.5 p-2 rounded-lg bg-white border border-slate-200/70 hover:border-indigo-300 cursor-pointer text-xs text-slate-700">
+                <input type="radio" name="lab-q-${qIdx}" value="${oIdx}" class="accent-indigo-600" />
+                <span>${escapeHTML(opt)}</span>
+              </label>
+            `).join('')}
+          </div>
+          <div id="lab-q-exp-${qIdx}" class="hidden text-[11px] p-2.5 rounded-lg bg-indigo-50 text-indigo-900"></div>
+        </div>
+      `).join('');
+    }
+
+    function playListeningAudio() {
+      if (!appState.currentLabData) return;
+      const fullText = appState.currentLabData.paragraphs.join(' ');
+      const rate = parseFloat(document.getElementById('listening-speed-select').value) || 1.0;
+      document.getElementById('listening-status-text').textContent = 'Playing audio recording...';
+      speakTextAloud(fullText, rate, () => {
+        document.getElementById('listening-status-text').textContent = 'Playback finished.';
+      });
+    }
+
+    function stopListeningAudio() {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      const statusEl = document.getElementById('listening-status-text');
+      if (statusEl) statusEl.textContent = 'Ready to play audio recording';
+    }
+
+    function toggleListeningTranscript() {
+      appState.transcriptVisible = !appState.transcriptVisible;
+      renderLabContent();
+    }
+
+    function gradeLabAnswers() {
+      const data = appState.currentLabData;
+      if (!data) return;
+
+      let correct = 0;
+      data.questions.forEach((item, idx) => {
+        const selected = document.querySelector(`input[name="lab-q-${idx}"]:checked`);
+        const userAns = selected ? parseInt(selected.value, 10) : -1;
+        const card = document.getElementById(`lab-q-card-${idx}`);
+        const exp = document.getElementById(`lab-q-exp-${idx}`);
+
+        exp.classList.remove('hidden');
+        if (userAns === item.answer) {
+          correct++;
+          card.classList.remove('border-slate-200/80', 'border-rose-300');
+          card.classList.add('border-emerald-400', 'bg-emerald-50/30');
+          exp.className = 'text-[11px] p-2.5 rounded-lg bg-emerald-100/80 text-emerald-900';
+          exp.innerHTML = `<strong>Correct!</strong> ${escapeHTML(item.explanation)}`;
+        } else {
+          card.classList.remove('border-slate-200/80', 'border-emerald-400');
+          card.classList.add('border-rose-300', 'bg-rose-50/30');
+          exp.className = 'text-[11px] p-2.5 rounded-lg bg-rose-100/80 text-rose-900';
+          exp.innerHTML = `<strong>Answer: ${escapeHTML(item.options[item.answer])}.</strong> ${escapeHTML(item.explanation)}`;
+        }
+      });
+
+      const scaledRaw = Math.round((correct / data.questions.length) * 40);
+      const estBand = convertRawScoreToBand(scaledRaw, appState.labMode === 'listening' ? 'listening' : 'academic');
+
+      const pill = document.getElementById('lab-score-pill');
+      pill.textContent = `${correct}/${data.questions.length} • Est. Band ${estBand.toFixed(1)}`;
+      pill.classList.remove('hidden');
+
+      if (appState.labMode === 'listening') {
+        appState.stats.listeningScores.push(estBand);
+      } else {
+        appState.stats.readingScores.push(estBand);
+      }
+      appState.stats.history.push({
+        type: appState.labMode === 'listening' ? 'Listening' : 'Reading',
+        title: data.title,
+        band: estBand,
+        date: new Date().toLocaleDateString()
+      });
+      saveStats();
+      showToast(`Scored ${correct}/${data.questions.length} (Est. Band ${estBand.toFixed(1)})!`, 'success');
+    }
+
+    async function generateAILabTest() {
+      const btn = document.getElementById('btn-generate-lab');
+      const isListening = appState.labMode === 'listening';
+      const prompt = isListening
+        ? 'Generate an authentic IELTS Listening Section 4 academic monologue script (about 160-200 words) on a fascinating science, history, or urban design topic, along with 4 multiple-choice questions and explanations.'
+        : 'Generate an authentic IELTS Academic Reading passage (3 paragraphs, ~260 words total) on a scholarly topic, along with 4 comprehension questions (mix of Multiple Choice and TRUE/FALSE/NOT GIVEN) and detailed explanations.';
+
+      const res = await callGeminiJSON({
+        systemInstruction: 'You are an official Cambridge IELTS test creator. Ensure every question is strictly answerable from the text.',
+        userPrompt: prompt,
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            title: { type: 'STRING' },
+            paragraphs: { type: 'ARRAY', items: { type: 'STRING' } },
+            questions: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  q: { type: 'STRING' },
+                  options: { type: 'ARRAY', items: { type: 'STRING' } },
+                  answer: { type: 'INTEGER' },
+                  explanation: { type: 'STRING' }
+                },
+                required: ['q', 'options', 'answer', 'explanation']
+              }
+            }
+          },
+          required: ['title', 'paragraphs', 'questions']
+        },
+        buttonEl: btn,
+        loadingText: 'Building Test...'
+      });
+
+      if (res && res.paragraphs && res.questions) {
+        stopListeningAudio();
+        appState.transcriptVisible = false;
+        appState.currentLabData = res;
+        renderLabContent();
+        showToast('New AI IELTS test ready!', 'success');
+      }
+    }
+
+    // =========================================================================
+    // 8. VOCABULARY BOOSTER GAME (BAND 6 -> BAND 8+ SPRINT)
+    // =========================================================================
+    const DEFAULT_VOCAB_DECK = [
+      {
+        before: 'Rapid urban growth has caused',
+        weak: 'very bad traffic jams',
+        after: 'in major metropolitan areas.',
+        options: ['severe urban congestion', 'big car fullness', 'heavy road stopping', 'lots of vehicle crowding'],
+        correct: 0,
+        note: '"Severe urban congestion" is a precise Band 8.5+ noun phrase commonly used in Task 2 essays.'
+      },
+      {
+        before: 'Governments must take urgent action to',
+        weak: 'stop climate change from getting worse',
+        after: 'before irreversible tipping points are reached.',
+        options: ['make weather cooler', 'mitigate climate change', 'fix the hot air', 'stop global heating up'],
+        correct: 1,
+        note: '"Mitigate" (reduce the severity of) is a high-value academic verb for environmental topics.'
+      },
+      {
+        before: 'Excessive reliance on social media can',
+        weak: 'harm young people’s mental health',
+        after: 'over prolonged periods.',
+        options: ['break teenage brains', 'adversely affect adolescent well-being', 'make youth sad inside', 'hurt young minds badly'],
+        correct: 1,
+        note: '"Adversely affect adolescent well-being" upgrades both adverb-verb collocation and lexical precision.'
+      },
+      {
+        before: 'Investing in renewable energy infrastructure is',
+        weak: 'very important for',
+        after: 'achieving long-term economic sustainability.',
+        options: ['super good at', 'paramount to', 'nice enough for', 'okay regarding'],
+        correct: 1,
+        note: '"Paramount to" (more important than anything else) elevates formal academic tone.'
+      },
+      {
+        before: 'The gap between high-income and low-income households has',
+        weak: 'grown much bigger',
+        after: 'over the past two decades.',
+        options: ['widened considerably', 'gotten super wide', 'expanded hugely up', 'become extra large'],
+        correct: 0,
+        note: '"Widened considerably" is the standard natural collocation when describing inequality or gaps.'
+      },
+      {
+        before: 'Strict regulations are necessary to',
+        weak: 'stop companies from polluting',
+        after: 'local waterways with industrial waste.',
+        options: ['deter corporations from contaminating', 'block factories making dirty', 'keep businesses off water', 'halt firms putting trash'],
+        correct: 0,
+        note: '"Deter corporations from contaminating" demonstrates strong formal verb + preposition control.'
+      }
+    ];
+
+    appState.vocabDeck = [...DEFAULT_VOCAB_DECK];
+
+    // Subtle synthesized feedback chime using Web Audio API (no external URLs)
+    function playGameTone(isSuccess) {
+      if (!appState.voiceEnabled) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = isSuccess ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(isSuccess ? 587.33 : 220, ctx.currentTime);
+        if (isSuccess) osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.19);
+      } catch {}
+    }
+
+    function startVocabSprint() {
+      if (appState.vocabInterval) clearInterval(appState.vocabInterval);
+      appState.vocabActive = true;
+      appState.vocabTimer = 60;
+      appState.vocabScore = 0;
+      appState.vocabStreak = 1;
+      appState.vocabIndex = 0;
+
+      // Shuffle deck
+      appState.vocabDeck.sort(() => Math.random() - 0.5);
+
+      document.getElementById('vocab-start-screen').classList.add('hidden');
+      document.getElementById('vocab-play-screen').classList.remove('hidden');
+      document.getElementById('vocab-feedback-banner').classList.add('hidden');
+
+      updateVocabHUD();
+      renderVocabQuestion();
+
+      appState.vocabInterval = setInterval(() => {
+        appState.vocabTimer--;
+        updateVocabHUD();
+        if (appState.vocabTimer <= 0) {
+          endVocabSprint();
+        }
+      }, 1000);
+    }
+
+    function updateVocabHUD() {
+      document.getElementById('vocab-timer').textContent = `${appState.vocabTimer}s`;
+      document.getElementById('vocab-score').textContent = appState.vocabScore;
+      document.getElementById('vocab-streak').textContent = `${appState.vocabStreak}x`;
+    }
+
+    function renderVocabQuestion() {
+      const card = appState.vocabDeck[appState.vocabIndex % appState.vocabDeck.length];
+      document.getElementById('vocab-sentence').innerHTML =
+        `${escapeHTML(card.before)} <span class="px-2 py-0.5 rounded-lg bg-amber-100 text-amber-900 border border-amber-300 font-bold">${escapeHTML(card.weak)}</span> ${escapeHTML(card.after)}`;
+
+      document.getElementById('vocab-options-grid').innerHTML = card.options.map((opt, idx) => `
+        <button onclick="answerVocabQuestion(${idx})" class="p-4 rounded-xl bg-white border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 text-left text-xs sm:text-sm font-bold text-slate-800 transition-all shadow-sm">
+          ${escapeHTML(opt)}
+        </button>
+      `).join('');
+    }
+
+    function answerVocabQuestion(chosenIdx) {
+      if (!appState.vocabActive) return;
+      const card = appState.vocabDeck[appState.vocabIndex % appState.vocabDeck.length];
+      const banner = document.getElementById('vocab-feedback-banner');
+      banner.classList.remove('hidden');
+
+      if (chosenIdx === card.correct) {
+        const gained = 10 * appState.vocabStreak;
+        appState.vocabScore += gained;
+        appState.vocabStreak = Math.min(4, appState.vocabStreak + 1);
+        playGameTone(true);
+        banner.className = 'p-3.5 rounded-xl text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-900';
+        banner.innerHTML = `<strong>+${gained} XP!</strong> ${escapeHTML(card.note)}`;
+      } else {
+        appState.vocabStreak = 1;
+        playGameTone(false);
+        banner.className = 'p-3.5 rounded-xl text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-900';
+        banner.innerHTML = `<strong>Best Band 8+ choice: "${escapeHTML(card.options[card.correct])}".</strong> ${escapeHTML(card.note)}`;
+      }
+
+      updateVocabHUD();
+      appState.vocabIndex++;
+      renderVocabQuestion();
+    }
+
+    function endVocabSprint() {
+      clearInterval(appState.vocabInterval);
+      appState.vocabInterval = null;
+      appState.vocabActive = false;
+
+      appState.stats.vocabXP += appState.vocabScore;
+      if (appState.vocabScore > appState.stats.vocabBest) {
+        appState.stats.vocabBest = appState.vocabScore;
+      }
+      saveStats();
+
+      document.getElementById('vocab-play-screen').classList.add('hidden');
+      const startScreen = document.getElementById('vocab-start-screen');
+      startScreen.classList.remove('hidden');
+      startScreen.querySelector('h3').textContent = `Sprint Complete! You Earned ${appState.vocabScore} XP`;
+      startScreen.querySelector('p').textContent = `Total Lifetime Vocab XP: ${appState.stats.vocabXP} • Personal Best: ${appState.stats.vocabBest} XP`;
+      showToast(`Sprint finished! +${appState.vocabScore} Vocab XP added.`, 'success');
+    }
+
+    async function generateAIVocabDeck() {
+      const topic = document.getElementById('vocab-topic-select').value;
+      const btn = document.getElementById('btn-ai-vocab');
+
+      const res = await callGeminiJSON({
+        systemInstruction: 'You are an IELTS Lexical Resource specialist. Create 6 Band 6 -> Band 8.5+ vocabulary upgrade flashcards.',
+        userPrompt: `Generate 6 IELTS vocabulary upgrade items on the topic "${topic}". Each item must have "before" (text before weak phrase), "weak" (weak Band 5.5/6 phrase), "after" (text after weak phrase), "options" (array of 4 choices where 1 is a natural Band 8.5+ collocation and 3 are awkward/informal), "correct" (0-based index of the correct option), and "note" (brief explanation).`,
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            cards: {
+              type: 'ARRAY',
+              items: {
+                type: 'OBJECT',
+                properties: {
+                  before: { type: 'STRING' },
+                  weak: { type: 'STRING' },
+                  after: { type: 'STRING' },
+                  options: { type: 'ARRAY', items: { type: 'STRING' } },
+                  correct: { type: 'INTEGER' },
+                  note: { type: 'STRING' }
+                },
+                required: ['before', 'weak', 'after', 'options', 'correct', 'note']
+              }
+            }
+          },
+          required: ['cards']
+        },
+        buttonEl: btn,
+        loadingText: 'Creating Deck...'
+      });
+
+      if (res && res.cards && res.cards.length) {
+        appState.vocabDeck = res.cards;
+        showToast(`Loaded ${res.cards.length} AI cards for ${topic}!`, 'success');
+        startVocabSprint();
+      }
+    }
+
+    // =========================================================================
+    // 9. INITIALIZATION & PWA INLINE MANIFEST REGISTRATION
+    // =========================================================================
+    function registerInlinePWAManifest() {
+      try {
+        const manifest = {
+          name: 'Polingual IELTS Studio',
+          short_name: 'Polingual',
+          start_url: '.',
+          display: 'standalone',
+          background_color: '#f8fafc',
+          theme_color: '#4f46e5',
+          description: 'Zero-cost AI IELTS & English Preparation Studio'
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = URL.createObjectURL(blob);
+        document.head.appendChild(link);
+      } catch {}
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      registerInlinePWAManifest();
+      updateApiStatusIndicators();
+      updateBandCalculator();
+      updateRawConverter(30);
+      renderDashboardStats();
+      loadLabPreset();
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
